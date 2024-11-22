@@ -20,9 +20,43 @@
     </div>
 
     <div class="mainView">
-        <p>Content goes here...</p>
+		
+		<div id="loading-indicator" style="display: none;">
+        Loading... This can take a minute or more 
+    </div>
+    <div id="table-tabs">
+    <!-- Tables for different metadata types will be dynamically created here -->
+    </div>
+    <button class="styled-button" id="help-button">Help</button> 
+    <div id="conflict-summary-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span> 
+            <h2>Conflict Summary</h2>
+            <div id="conflict-summary-table-summary"></div>
+            <p>Objects with conflicts are listed in the table below (if applicable)</p>
+            <table id="conflict-summary-table">
+                <thead>
+                    <tr>
+                        <th>Object Name</th>
+                        <th>Object ID</th>
+                        <th>Conflicting Property</th>
+                        <th>Conflicting Object ID</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeHelpModal()">&times;</span> 
+            <h1>Help and instructions for Space Out!</h1>
+            <p><i>It is crucial to first run this tool in a development or test environment</i> to ensure that there are no disruptions to your production environment.</p>
+            <!-- The rest of the help content -->
+        </div>
+    </div>
 
-        <button onclick="helloWorld()">Hello</button>
+
     </div>
 </body>
 

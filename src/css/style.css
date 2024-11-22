@@ -52,3 +52,139 @@ body {
 .mainView {
 	margin-top: 48px;
 }
+
+.highlight {
+    background-color: yellow;
+}
+.table-container {
+    display: none;
+}
+.table-container.active {
+    display: block;
+}
+th, td {
+    padding: 10px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th {
+    background: #f2f2f2;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.tabs {
+    overflow: hidden;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+}
+.tabs button {
+    background: inherit;
+    border: none;
+    padding: 14px 16px;
+    cursor: pointer;
+}
+.tabs .active {
+    border-bottom: 3px solid #007bff;
+}
+.status-ready {
+    color: green;
+}
+.status-conflict {
+    color: yellow;
+}
+.status-error {
+    color: red;
+}
+.success-message {
+    text-align: center;
+    font-size: 2em;
+    color: green;
+    margin-top: 50px;
+}
+.fix-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); 
+    padding-top: 60px;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    border-radius: 8px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+    position: relative;
+}
+.modal.open {
+    display: block; 
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+#conflict-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20;
+}
+#conflict-summary-table th, #conflict-summary-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+#conflict-summary-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+    color: #333;
+}
+#conflict-summary-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+#conflict-summary-table tr:hover {
+    background-color: #ddd;
+}
+.styled-button {
+    padding: 5px 8px;
+    font-size: 12px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 3px;
+}
+.styled-button:hover {
+    background-color: #0056b3;
+}
+.styled-button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+#help-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
