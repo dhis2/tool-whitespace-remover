@@ -6,6 +6,7 @@ import $ from "jquery"; //eslint-disable-line
 
 //CSS
 import "./css/style.css";
+import "./css/header.css";
 
 
 // Function to highlight leading, trailing, and double spaces
@@ -69,7 +70,7 @@ function renderTables(data) {
         var $table = $("<table>").append(
             $("<thead>").append(
                 `<tr>
-                        <th>Select <input type="checkbox" onclick="selectAll('${type}', this)"></th>
+                        <th><input type="checkbox" onclick="selectAll('${type}', this)"></th>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Short Name</th>
@@ -96,7 +97,7 @@ function renderTables(data) {
                     <td>${code}</td>
                     <td>${description}</td>
                     <td>
-                        <button class="styled-button" class="check-button" onclick="checkConflicts('${type}', '${obj.id}')">Check</button>
+                        <button class="styled-button check-button" onclick="checkConflicts('${type}', '${obj.id}')">Check</button>
                         <button class="styled-button fix-button" onclick="fixObject('${type}', '${obj.id}')" disabled>Fix</button>
                     </td>
                     <td class="status-cell"></td>`
@@ -107,13 +108,16 @@ function renderTables(data) {
         var $container = $("<div>", { class: "table-container", id: `${type}-container` }).append(
             `<h2>${type.charAt(0).toUpperCase() + type.slice(1)}</h2>`,
             $table,
-            `<button class="styled-button"  onclick="checkAll('${type}')">Check Selected</button>
-                 <button class="styled-button"  id="fix-all-${type}" class="fix-button" onclick="fixAll('${type}')" disabled>Fix Selected</button>`
+            `<div class="button-group">
+                <button class="styled-button"  onclick="checkAll('${type}')">Check Selected</button>
+                <button class="styled-button"  id="fix-all-${type}" class="fix-button" onclick="fixAll('${type}')" disabled>Fix Selected</button>
+            </div>`
         );
 
         $("#table-tabs").append($container);
     }
 }
+
 
 function createTabs(types) {
     var $tabs = $("<div class=\"tabs\">");
