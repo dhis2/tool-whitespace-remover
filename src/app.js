@@ -1,6 +1,7 @@
 "use strict";
 
 //JS
+import { d2Get, d2PostJson, d2PutJson } from "./js/d2api.js"; // Assuming d2Get and d2PostJson are stored in api.js
 import $ from "jquery"; //eslint-disable-line
 
 //CSS
@@ -19,40 +20,47 @@ function quoteString(string) {
     return string ? `"${string}"` : "";
 }
 
-function fetchAndRenderMetadata() {
+
+async function fetchAndRenderMetadata() {
     $("#loading-indicator").show(); // Show loading indicator
 
-    var requests = [];
-    var types = ["name", "code", "description"];
+    try {
+        var requests = [];
+        var types = ["name", "code", "description"];
 
-    types.forEach(function (type) {
-        requests.push(
-            $.getJSON(`../../metadata.json?filter=${type}:ilike:%20%20&fields=id,name,shortName,code,description`),
-            $.getJSON(`../../metadata.json?filter=${type}:$ilike:%20&fields=id,name,shortName,code,description`),
-            $.getJSON(`../../metadata.json?filter=${type}:ilike$:%20&fields=id,name,shortName,code,description`)
-        );
-    });
+        types.forEach(function (type) {
+            requests.push(
+                d2Get(`/api/metadata.json?filter=${type}:ilike:%20%20&fields=id,name,shortName,code,description`),
+                d2Get(`/api/metadata.json?filter=${type}:$ilike:%20&fields=id,name,shortName,code,description`),
+                d2Get(`/api/metadata.json?filter=${type}:ilike$:%20&fields=id,name,shortName,code,description`)
+            );
+        });
 
-    $.when(...requests).then(function (...responses) {
+        const responses = await Promise.all(requests);
+
         $("#loading-indicator").hide(); // Hide loading indicator
 
         var mergedData = {};
-        responses.forEach(function (response) {
-            var data = response[0];
+        responses.forEach(function (data) {
             for (var key in data) {
                 if (key === "system") continue;
                 if (!mergedData[key]) mergedData[key] = [];
                 mergedData[key] = mergedData[key].concat(data[key]);
             }
         });
+
         // Remove duplicates
         for (var key in mergedData) {
             mergedData[key] = mergedData[key].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
         }
+
         renderTables(mergedData);
         createTabs(Object.keys(mergedData));
-    });
+    } catch (err) {
+        console.error("Error fetching metadata:", err);
+    }
 }
+
 
 function renderTables(data) {
     $("#table-tabs").empty();
@@ -126,7 +134,7 @@ function openTab(type) {
     $(`#${type}-container`).addClass("active");
 }
 
-function checkConflicts(type, id) {
+async function checkConflicts(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
     /* eslint-disable no-useless-escape */
@@ -154,69 +162,66 @@ function checkConflicts(type, id) {
 
     if (name) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=name:eq:${name}&filter=id:!eq:${id}&fields=id,name`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=name:eq:${name}&filter=id:!eq:${id}&fields=id,name`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["name"] = data[endpoint];
             })
         );
     }
     if (shortName) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=shortName:eq:${shortName}&filter=id:!eq:${id}&fields=id,shortName`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=shortName:eq:${shortName}&filter=id:!eq:${id}&fields=id,shortName`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["shortName"] = data[endpoint];
             })
         );
     }
     if (code) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=code:eq:${code}&filter=id:!eq:${id}&fields=id,code`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=code:eq:${code}&filter=id:!eq:${id}&fields=id,code`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["code"] = data[endpoint];
             })
         );
     }
 
-    $.when(...requests).then(() => {
-        if (Object.keys(conflicts).length > 0) {
-            row.find(".status-cell").text("Conflict").addClass("status-conflict").removeClass("status-ready status-error");
-            row.find(".row-checkbox").prop("checked", false);
-            alert("Conflicts found: " + JSON.stringify(conflicts, null, 2));
-        } else {
-            row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
-            row.find(".fix-button").prop("disabled", false);
-            row.find(".row-checkbox").prop("checked", true);
-        }
-        updateFixAllButton(type);
-    });
+    await Promise.all(requests);
+
+    if (Object.keys(conflicts).length > 0) {
+        row.find(".status-cell").text("Conflict").addClass("status-conflict").removeClass("status-ready status-error");
+        row.find(".row-checkbox").prop("checked", false);
+        alert("Conflicts found: " + JSON.stringify(conflicts, null, 2));
+    } else {
+        row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
+        row.find(".fix-button").prop("disabled", false);
+        row.find(".row-checkbox").prop("checked", true);
+    }
+    updateFixAllButton(type);
 }
 
-function fixObject(type, id) {
+async function fixObject(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
 
-    $.getJSON(`../../${endpoint}/${id}?fields=:owner`, function (data) {
+    try {
+        let data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
         if (data.name) data.name = data.name.replace(/\s\s+/g, " ").trim();
         if (data.shortName) data.shortName = data.shortName.replace(/\s\s+/g, " ").trim();
         if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
         if (data.description) data.description = data.description.replace(/\s\s+/g, " ").trim();
 
-        $.ajax({
-            url: `../../${endpoint}/${id}`,
-            method: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function () {
-                row.remove();
-                updateFixAllButton(type);
-                checkRemainingRows(type);
-            },
-            error: function () {
-                row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
-                row.find(".fix-button").prop("disabled", true);
-                row.find(".row-checkbox").prop("checked", false);
-                alert("Update failed");
-            }
-        });
-    });
+        await d2PutJson(`/api/${endpoint}/${id}`, data);
+
+        row.remove();
+        updateFixAllButton(type);
+        checkRemainingRows(type);
+
+    } catch (err) {
+        row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
+        row.find(".fix-button").prop("disabled", true);
+        row.find(".row-checkbox").prop("checked", false);
+        alert("Update failed");
+        console.error(err);
+    }
 }
+
 
 function showModal(conflictsSummary, noConflictCount) {
     var $modal = $("#conflict-summary-modal");
@@ -288,31 +293,14 @@ function checkAll(type) {
     })();
 }
 
-function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
+async function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
 
-    /* eslint-disable no-useless-escape */
-    var name = row.find("td:nth-child(3)").text()
-        .replace(/^"/, "") // Remove leading quote
-        .replace(/"$/, "") // Remove trailing quote
-        .replace(/\s{2,}/g, " ") // Replace double space with single space
-        .trim(); // Remove leading and trailing spaces
+    var name = row.find("td:nth-child(3)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
+    var shortName = row.find("td:nth-child(4)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
+    var code = row.find("td:nth-child(5)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
 
-    var shortName = row.find("td:nth-child(4)").text()
-        .replace(/^"/, "") // Remove leading quote
-        .replace(/"$/, "") // Remove trailing quote
-        .replace(/\s{2,}/g, " ") // Replace double space with single space
-        .trim(); // Remove leading and trailing spaces
-
-    var code = row.find("td:nth-child(5)").text()
-        .replace(/^"/, "") // Remove leading quote
-        .replace(/"$/, "") // Remove trailing quote
-        .replace(/\s{2,}/g, " ") // Replace double space with single space
-        .trim(); // Remove leading and trailing spaces
-    /* eslint-enable no-useless-escape */
-
-    // Encode field values to sanitize them
     var encodedName = encodeURIComponent(name);
     var encodedShortName = encodeURIComponent(shortName);
     var encodedCode = encodeURIComponent(code);
@@ -322,25 +310,27 @@ function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
 
     if (type !== "organisationUnits" && name) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=name:eq:${encodedName}&filter=id:!eq:${id}&fields=id,name`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=name:eq:${encodedName}&filter=id:!eq:${id}&fields=id,name`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) {
                     conflicts["name"] = data[endpoint].map(item => ({ conflictingObjectId: item.id, property: "Name" }));
                 }
             })
         );
     }
+
     if (type !== "organisationUnits" && shortName) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=shortName:eq:${encodedShortName}&filter=id:!eq:${id}&fields=id,shortName`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=shortName:eq:${encodedShortName}&filter=id:!eq:${id}&fields=id,shortName`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) {
                     conflicts["shortName"] = data[endpoint].map(item => ({ conflictingObjectId: item.id, property: "Short Name" }));
                 }
             })
         );
     }
+
     if (code) {
         requests.push(
-            $.getJSON(`../../${endpoint}.json?filter=code:eq:${encodedCode}&filter=id:!eq:${id}&fields=id,code`, function (data) {
+            d2Get(`/api/${endpoint}.json?filter=code:eq:${encodedCode}&filter=id:!eq:${id}&fields=id,code`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) {
                     conflicts["code"] = data[endpoint].map(item => ({ conflictingObjectId: item.id, property: "Code" }));
                 }
@@ -350,22 +340,9 @@ function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
 
     $selectedRows.each(function () {
         if ($(this).data("id") !== id) {
-            var otherName = $(this).find("td:nth-child(3)").text()
-                .replace(/^"/, "")
-                .replace(/"$/, "")
-                .replace(/\s{2,}/g, " ")
-                .trim();
-            var otherShortName = $(this).find("td:nth-child(4)").text()
-                .replace(/^"/, "")
-                .replace(/"$/, "")
-                .replace(/\s{2,}/g, " ")
-                .trim();
-            var otherCode = $(this).find("td:nth-child(5)").text()
-                .replace(/^"/, "")
-                .replace(/"$/, "")
-                .replace(/\s{2,}/g, " ")
-                .trim();
-
+            var otherName = $(this).find("td:nth-child(3)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
+            var otherShortName = $(this).find("td:nth-child(4)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
+            var otherCode = $(this).find("td:nth-child(5)").text().replace(/^"/, "").replace(/"$/, "").replace(/\s{2,}/g, " ").trim();
 
             if (type !== "organisationUnits" && name && name === otherName) {
                 conflicts["name"] = conflicts["name"] || [];
@@ -382,29 +359,30 @@ function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
         }
     });
 
-    return $.when(...requests).then(() => {
-        if (Object.keys(conflicts).length > 2) { // More than just `id` and `objectName`
-            row.find(".status-cell").text("Conflict").addClass("status-conflict").removeClass("status-ready status-error");
-            row.find(".row-checkbox").prop("checked", false);
-            for (var field in conflicts) {
-                if (field !== "id" && field !== "objectName") {
-                    conflicts[field].forEach(conflict => {
-                        conflictsSummary.push({
-                            objectName: conflicts.objectName,
-                            id: conflicts.id,
-                            property: conflict.property,
-                            conflictingObjectId: conflict.conflictingObjectId
-                        });
+    await Promise.all(requests);
+
+    if (Object.keys(conflicts).length > 2) { // More than just `id` and `objectName`
+        row.find(".status-cell").text("Conflict").addClass("status-conflict").removeClass("status-ready status-error");
+        row.find(".row-checkbox").prop("checked", false);
+        for (var field in conflicts) {
+            if (field !== "id" && field !== "objectName") {
+                conflicts[field].forEach(conflict => {
+                    conflictsSummary.push({
+                        objectName: conflicts.objectName,
+                        id: conflicts.id,
+                        property: conflict.property,
+                        conflictingObjectId: conflict.conflictingObjectId
                     });
-                }
+                });
             }
-        } else {
-            row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
-            row.find(".fix-button").prop("disabled", false);
         }
-        updateFixAllButton(type);
-    });
+    } else {
+        row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
+        row.find(".fix-button").prop("disabled", false);
+    }
+    updateFixAllButton(type);
 }
+
 
 function updateFixButton(type) {
     var $rows = $(`#${type}-body tr`);
@@ -475,33 +453,29 @@ function checkRemainingRows(type) {
     }
 }
 
-function fixObjectSummary(type, id) {
+async function fixObjectSummary(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
 
-    return $.getJSON(`../../${endpoint}/${id}?fields=:owner`, function (data) {
+    try {
+        let data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
         if (data.name) data.name = data.name.replace(/\s\s+/g, " ").trim();
         if (data.shortName) data.shortName = data.shortName.replace(/\s\s+/g, " ").trim();
         if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
         if (data.description) data.description = data.description.replace(/\s\s+/g, " ").trim();
 
-        return $.ajax({
-            url: `../../${endpoint}/${id}`,
-            method: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function () {
-                row.remove();
-                return true;
-            },
-            error: function () {
-                row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
-                row.find(".fix-button").prop("disabled", true);
-                row.find(".row-checkbox").prop("checked", false);
-                return false;
-            }
-        });
-    });
+        await d2PutJson(`/api/${endpoint}/${id}`,);
+
+        row.remove();
+        return true;
+
+    } catch (err) {
+        row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
+        row.find(".fix-button").prop("disabled", true);
+        row.find(".row-checkbox").prop("checked", false);
+        console.error("Update failed", err);
+        return false;
+    }
 }
 
 function selectAll(type, checkbox) {

@@ -90,7 +90,9 @@ const webpackConfig = {
         compress: true,
         proxy: {
             "/api": dhisConfig.baseUrl,
-        }
+        },
+        client: {
+            overlay: false}
     },
     mode: "development"
 };
