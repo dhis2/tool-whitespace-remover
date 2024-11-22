@@ -464,7 +464,7 @@ async function fixObjectSummary(type, id) {
         if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
         if (data.description) data.description = data.description.replace(/\s\s+/g, " ").trim();
 
-        await d2PutJson(`/api/${endpoint}/${id}`,);
+        await d2PutJson(`/api/${endpoint}/${id}`, data);
 
         row.remove();
         return true;
