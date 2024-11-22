@@ -44,3 +44,26 @@ export const d2PostJson = async (endpoint, body) => {
         });
     });
 };
+
+
+// PUT to API async
+export const d2PutJson = async (endpoint, body) => {
+    return new Promise(function (resolve, reject) {
+        $.ajax({
+            "type": "PUT",
+            "url": baseUrl + endpoint,
+            "dataType": "json",
+            "contentType": "application/json",
+            "data": JSON.stringify(body),
+            ...isDev && { "headers": { "Authorization": "Basic " + btoa(dhisDevConfig.username + ":" + dhisDevConfig.password) } },
+            "success": function (data) {
+                resolve(data);
+            },
+            "error": function (err) {
+                console.log("ERROR in PUT:");
+                console.log(err);
+                reject(err);
+            }
+        });
+    });
+};
