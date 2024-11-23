@@ -1,8 +1,8 @@
-# DHIS2 App Template for Dummies
-Basic DHIS2 app skeleton.
+# Whitespace Cleaner
+DHIS2 app to remove trailing, leading and double white space in metadata (name, shortName, description, code properties).
 
 ## License
-© Copyright 
+© Copyright HISP Centre
 
 
 ## Getting started
@@ -35,7 +35,7 @@ A different DHIS2 instance can be used to develop against by adding a `d2auth.js
 
 ```
 {
-    "baseUrl": "localhost:9000/dev",
+    "baseUrl": "http://localhost:9000/dev",
     "username": "john_doe",
     "password": "District1!"
 }
