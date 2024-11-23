@@ -1,7 +1,7 @@
 "use strict";
 
 //JS
-import { d2Get, d2PostJson, d2PutJson } from "./js/d2api.js"; // Assuming d2Get and d2PostJson are stored in api.js
+import { d2Get, d2PutJson } from "./js/d2api.js"; // Assuming d2Get and d2PostJson are stored in api.js
 import $ from "jquery"; //eslint-disable-line
 
 //CSS
@@ -161,26 +161,31 @@ async function checkConflicts(type, id) {
         .trim(); // Remove leading and trailing spaces
     /* eslint-enable no-useless-escape */
 
+    var encodedName = encodeURIComponent(name);
+    var encodedShortName = encodeURIComponent(shortName);
+    var encodedCode = encodeURIComponent(code);
+
+
     var requests = [];
     var conflicts = {};
 
     if (name) {
         requests.push(
-            d2Get(`/api/${endpoint}.json?filter=name:eq:${name}&filter=id:!eq:${id}&fields=id,name`).then(data => {
+            d2Get(`/api/${endpoint}.json?filter=name:eq:${encodedName}&filter=id:!eq:${id}&fields=id,name`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["name"] = data[endpoint];
             })
         );
     }
     if (shortName) {
         requests.push(
-            d2Get(`/api/${endpoint}.json?filter=shortName:eq:${shortName}&filter=id:!eq:${id}&fields=id,shortName`).then(data => {
+            d2Get(`/api/${endpoint}.json?filter=shortName:eq:${encodedShortName}&filter=id:!eq:${id}&fields=id,shortName`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["shortName"] = data[endpoint];
             })
         );
     }
     if (code) {
         requests.push(
-            d2Get(`/api/${endpoint}.json?filter=code:eq:${code}&filter=id:!eq:${id}&fields=id,code`).then(data => {
+            d2Get(`/api/${endpoint}.json?filter=code:eq:${encodedCode}&filter=id:!eq:${id}&fields=id,code`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["code"] = data[endpoint];
             })
         );
