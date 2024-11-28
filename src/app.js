@@ -21,11 +21,13 @@ function highlightSpaces(string) {
 }
 
 
+// Function to quote a string
 function quoteString(string) {
     return string ? `"${string}"` : "";
 }
 
 
+// Fetch and render metadata
 async function fetchAndRenderMetadata() {
     $("#loading-indicator").show(); // Show loading indicator
     $(".determinate").css("width", "50%"); // Update progress
@@ -72,6 +74,7 @@ async function fetchAndRenderMetadata() {
 }
 
 
+// Render tables with metadata
 function renderTables(data) {
     $("#table-tabs").empty();
     for (var type in data) {
@@ -131,6 +134,7 @@ function renderTables(data) {
 }
 
 
+// Create tabs for different metadata types
 function createTabs(types) {
     var $tabs = $("<ul class=\"tabs\">");
     types.forEach(function (type) {
@@ -142,11 +146,11 @@ function createTabs(types) {
 }
 
 
+// Check for conflicts in metadata
 async function checkConflicts(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
     var conflictsSummary = [];
-
     /* eslint-disable no-useless-escape */
     var name = row.find("td:nth-child(3)").text()
         .replace(/^\"/, "") // Remove leading quote
@@ -228,6 +232,7 @@ async function checkConflicts(type, id) {
 }
 
 
+// Fix metadata object
 async function fixObject(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
@@ -261,6 +266,7 @@ async function fixObject(type, id) {
 }
 
 
+// Show conflict summary modal
 function showConflictSummaryModal(conflictsSummary, noConflictCount, conflictCount) {
     var $modal = $("#conflict-summary-modal");
     var $tableBody = $("#conflict-summary-table tbody");
@@ -298,6 +304,7 @@ function showConflictSummaryModal(conflictsSummary, noConflictCount, conflictCou
 }
 
 
+// Show import results modal
 function showImportResultsModal(importResults, importErrors = []) {
     var $modal = $("#import-results-modal");
     var $importResultsSummary = $("#import-results-summary");
@@ -329,6 +336,7 @@ function showImportResultsModal(importResults, importErrors = []) {
 }
 
 
+// Check all selected rows for conflicts
 function checkAll(type) {
     var $selectedRows = $(`#${type}-body tr`).filter(function () {
         return $(this).find(".row-checkbox").is(":checked");
@@ -368,6 +376,7 @@ function checkAll(type) {
 }
 
 
+// Check conflicts summary for a batch of rows
 async function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
@@ -459,6 +468,7 @@ async function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) 
 }
 
 
+// Update fix button state
 function updateFixButton(type) {
     var $rows = $(`#${type}-body tr`);
     $rows.each(function () {
@@ -473,6 +483,7 @@ function updateFixButton(type) {
 }
 
 
+// Update fix all button state
 function updateFixAllButton(type) {
     var allReady = true;
     var $rows = $(`#${type}-body tr`);
@@ -487,6 +498,7 @@ function updateFixAllButton(type) {
 }
 
 
+// Fix all selected rows
 function fixAll(type) {
     var $rows = $(`#${type}-body tr:has(.row-checkbox:checked)`);
     var totalFixed = 0;
@@ -516,6 +528,7 @@ function fixAll(type) {
 }
 
 
+// Check remaining rows and update UI
 function checkRemainingRows(type) {
     var $rows = $(`#${type}-body tr`);
     if ($rows.length === 0) {
@@ -538,6 +551,7 @@ function checkRemainingRows(type) {
 }
 
 
+// Fix metadata object summary
 async function fixObjectSummary(type, id, name) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
@@ -567,6 +581,7 @@ async function fixObjectSummary(type, id, name) {
 }
 
 
+// Select all rows in a table
 function selectAll(type, checkbox) {
     var $rows = $(`#${type}-body tr`);
     $rows.find(".row-checkbox").prop("checked", checkbox.checked);
