@@ -1,69 +1,167 @@
-const dhisDevConfig = DHIS_CONFIG; // eslint-disable-line
+const dhisDevConfig = DHIS_CONFIG;  
 const isDev = "baseUrl" in dhisDevConfig;
 const baseUrl = isDev ? dhisDevConfig.baseUrl : "../../..";
 
-import $ from "jquery";
-
-//GET from API async
-export const d2Get = async (endpoint) => {
-    return new Promise(function (resolve, reject) {
-        $.ajax({
-            "type": "GET",
-            "url": baseUrl + endpoint,
-            "dataType": "json",
-            ...isDev && { "headers": { "Authorization": "Basic " + btoa(dhisDevConfig.username + ":" + dhisDevConfig.password) } },
-            "success": function (data) {
-                resolve(data);
-            },
-            "error": function (err) {
-                console.log("ERROR in GET:");
-                console.log(err);
-                reject(err);
-            }
-        });
-    });
+// Helper function to set headers for development mode
+const getHeaders = () => {
+    let headers = new Headers();
+    if (isDev) {
+        headers.set("Authorization", "Basic " + btoa(dhisDevConfig.username + ":" + dhisDevConfig.password));
+    }
+    return headers;
 };
 
-//POST to API async
-export const d2PostJson = async (endpoint, body) => {
-    return new Promise(function (resolve, reject) {
-        $.ajax({
-            "type": "POST",
-            "url": baseUrl + endpoint,
-            "dataType": "json",
-            "data": body,
-            ...isDev && { "headers": { "Authorization": "Basic " + btoa(dhisDevConfig.username + ":" + dhisDevConfig.password) } },
-            "success": function (data) {
-                resolve(data);
-            },
-            "error": function (err) {
-                console.log("ERROR in POST:");
-                console.log(err);
-                reject(false);
-            }
+// Helper function to standardize endpoint format
+const formatEndpoint = (endpoint) => {
+    // Remove any leading slashes
+    if (endpoint.startsWith("/")) {
+        endpoint = endpoint.slice(1);
+    }
+
+    // Remove any leading 'api/'
+    if (endpoint.startsWith("api/")) {
+        endpoint = endpoint.slice(4);
+    }
+
+    // Ensure the final format is /api/...
+    // Ensure the final format is /api/...
+    return `/api/${endpoint}`;
+};
+
+// Helper function to validate endpoint UID (11 characters, alphanumeric)
+const validateUID = (endpoint) => {
+    const uid = endpoint.split("/").pop();
+    return /^[A-Za-z0-9]{11}$/.test(uid);
+};
+
+
+// Helper function to handle API errors and throw detailed error messages
+const handleApiError = async (response) => {
+    let errorMessage = "Network response was not ok";
+    let errorDetail = await response.json(); // Capture the error response body text
+
+    errorMessage = errorDetail.message || errorMessage;
+
+    throw new Error(`${response.statusText} - ${errorMessage}`);
+};
+
+// GET from API async
+export const d2Get = async (endpoint) => {
+    try {
+        endpoint = formatEndpoint(endpoint);
+        let headers = getHeaders();
+        let response = await fetch(baseUrl + endpoint, {
+            method: "GET",
+            headers: headers
         });
-    });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("ERROR in GET:");
+        console.log(error);
+        throw error;
+    }
+};
+
+// POST to API async
+export const d2PostJson = async (endpoint, body) => {
+    try {
+        endpoint = formatEndpoint(endpoint);
+        let headers = getHeaders();
+        headers.set("Content-Type", "application/json");
+        let response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(body)
+        });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("ERROR in POST:");
+        console.log(error);
+        throw error;
+    }
+};
+
+// POST with text/plain to API async
+export const d2PostPlain = async (endpoint, body) => {
+    try {
+        endpoint = formatEndpoint(endpoint);
+        let headers = getHeaders();
+        headers.set("Content-Type", "text/plain");
+        let response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: headers,
+            body: body
+        });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("ERROR in POST PLAIN:");
+        console.log(error);
+        throw error;
+    }
 };
 
 
 // PUT to API async
 export const d2PutJson = async (endpoint, body) => {
-    return new Promise(function (resolve, reject) {
-        $.ajax({
-            "type": "PUT",
-            "url": baseUrl + endpoint,
-            "dataType": "json",
-            "contentType": "application/json",
-            "data": JSON.stringify(body),
-            ...isDev && { "headers": { "Authorization": "Basic " + btoa(dhisDevConfig.username + ":" + dhisDevConfig.password) } },
-            "success": function (data) {
-                resolve(data);
-            },
-            "error": function (err) {
-                console.log("ERROR in PUT:");
-                console.log(err);
-                reject(err);
-            }
+    try {
+        endpoint = formatEndpoint(endpoint);
+
+        if (!validateUID(endpoint)) {
+            console.warn("Warning: The endpoint does not end with a valid 11-character UID");
+        }
+
+        let headers = getHeaders();
+        headers.set("Content-Type", "application/json");
+        let response = await fetch(baseUrl + endpoint, {
+            method: "PUT",
+            headers: headers,
+            body: JSON.stringify(body)
         });
-    });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("ERROR in PUT:");
+        console.log(error);
+        throw error;
+    }
+};
+
+// DELETE from API async
+export const d2Delete = async (endpoint) => {
+    try {
+        endpoint = formatEndpoint(endpoint);
+
+        if (!validateUID(endpoint)) {
+            console.warn("Warning: The endpoint does not end with a valid 11-character UID");
+        }
+
+        let headers = getHeaders();
+        let response = await fetch(baseUrl + endpoint, {
+            method: "DELETE",
+            headers: headers
+        });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        return { status: "success" };
+    } catch (error) {
+        console.log("ERROR in DELETE:");
+        console.log(error);
+        throw error;
+    }
 };
