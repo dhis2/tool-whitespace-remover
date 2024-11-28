@@ -24,7 +24,6 @@ const formatEndpoint = (endpoint) => {
     }
 
     // Ensure the final format is /api/...
-    // Ensure the final format is /api/...
     return `/api/${endpoint}`;
 };
 

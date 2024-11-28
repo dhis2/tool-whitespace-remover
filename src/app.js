@@ -20,6 +20,7 @@ function highlightSpaces(string) {
     return string;
 }
 
+
 function quoteString(string) {
     return string ? `"${string}"` : "";
 }
@@ -69,7 +70,6 @@ async function fetchAndRenderMetadata() {
         $("#loading-indicator").fadeOut(); // Hide loading indicator on error
     }
 }
-
 
 
 function renderTables(data) {
@@ -131,9 +131,6 @@ function renderTables(data) {
 }
 
 
-
-
-
 function createTabs(types) {
     var $tabs = $("<ul class=\"tabs\">");
     types.forEach(function (type) {
@@ -145,23 +142,11 @@ function createTabs(types) {
 }
 
 
-
-
-function openTab(type) {
-    // Remove active class from all tabs and tab contents
-    $(".tabs .tab a").removeClass("active");
-    $(".table-container").removeClass("active");
-
-    // Add active class to the selected tab and tab content
-    $(`.tabs a[href='#${type}-container']`).addClass("active");
-    $(`#${type}-container`).addClass("active");
-}
-
 async function checkConflicts(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
     var conflictsSummary = [];
-    var importErrors = [];
+
     /* eslint-disable no-useless-escape */
     var name = row.find("td:nth-child(3)").text()
         .replace(/^\"/, "") // Remove leading quote
@@ -242,6 +227,7 @@ async function checkConflicts(type, id) {
     updateFixAllButton(type);
 }
 
+
 async function fixObject(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
@@ -311,6 +297,7 @@ function showConflictSummaryModal(conflictsSummary, noConflictCount, conflictCou
     document.getElementById("conflict-summary-modal").scrollIntoView();
 }
 
+
 function showImportResultsModal(importResults, importErrors = []) {
     var $modal = $("#import-results-modal");
     var $importResultsSummary = $("#import-results-summary");
@@ -341,11 +328,6 @@ function showImportResultsModal(importResults, importErrors = []) {
     document.getElementById("import-results-modal").scrollIntoView();
 }
 
-function closeModal() {
-    var $modal = $("#conflict-summary-modal");
-    var instance = M.Modal.getInstance($modal[0]);
-    instance.close();
-}
 
 function checkAll(type) {
     var $selectedRows = $(`#${type}-body tr`).filter(function () {
@@ -384,6 +366,7 @@ function checkAll(type) {
         processBatch(batch).then(processNextBatch);
     })();
 }
+
 
 async function checkConflictsSummary(type, id, conflictsSummary, $selectedRows) {
     var row = $(`tr[data-id='${id}']`);
@@ -532,6 +515,7 @@ function fixAll(type) {
     });
 }
 
+
 function checkRemainingRows(type) {
     var $rows = $(`#${type}-body tr`);
     if ($rows.length === 0) {
@@ -552,6 +536,7 @@ function checkRemainingRows(type) {
         }
     }
 }
+
 
 async function fixObjectSummary(type, id, name) {
     var row = $(`tr[data-id='${id}']`);
@@ -581,6 +566,7 @@ async function fixObjectSummary(type, id, name) {
     }
 }
 
+
 function selectAll(type, checkbox) {
     var $rows = $(`#${type}-body tr`);
     $rows.find(".row-checkbox").prop("checked", checkbox.checked);
@@ -602,24 +588,10 @@ $(function () {
 });
 
 
-// Expose functions to the global scope
-window.highlightSpaces = highlightSpaces;
-window.quoteString = quoteString;
+// Expose only necessary functions to the global scope
 window.fetchAndRenderMetadata = fetchAndRenderMetadata;
-window.renderTables = renderTables;
-window.createTabs = createTabs;
-window.openTab = openTab;
 window.checkConflicts = checkConflicts;
 window.fixObject = fixObject;
-window.showConflictSummaryModal = showConflictSummaryModal;
-window.showImportResultsModal = showImportResultsModal;
-window.closeModal = closeModal;
 window.checkAll = checkAll;
-window.checkConflictsSummary = checkConflictsSummary;
-window.updateFixButton = updateFixButton;
-window.updateFixAllButton = updateFixAllButton;
 window.fixAll = fixAll;
-window.checkRemainingRows = checkRemainingRows;
-window.fixObjectSummary = fixObjectSummary;
 window.selectAll = selectAll;
-
