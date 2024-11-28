@@ -1,81 +1,8 @@
-/* Highlight rules */
-.highlight {
+/* Whitespace highlight rules */
+.whitespace-highlight {
     background-color: #ffeb3b; /* Material yellow 300 */
 }
 
-/* Table container rules */
-.table-container {
-    display: none;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Material shadow */
-}
-
-.table-container.active {
-    display: block;
-}
-
-/* Table rules */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px; /* Smaller font size for higher density */
-}
-
-th, td {
-    padding: 12px; /* Material padding */
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0; /* Material divider */
-}
-
-th {
-    background: #f5f5f5; /* Material background */
-    color: #616161; /* Material text color */
-    text-transform: uppercase; /* Material uppercase headings */
-    font-weight: 500;
-    letter-spacing: 0.1em;
-}
-
-tr:nth-child(even) {
-    background-color: #fafafa; /* Material background */
-}
-
-tr:hover {
-    background-color: #f1f1f1; /* Highlight row on hover */
-}
-
-/* Tab rules */
-.tabs {
-    overflow: hidden;
-    background: #ffffff;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 20px;
-}
-
-.tabs button {
-    background: inherit;
-    border: none;
-    padding: 14px 16px;
-    cursor: pointer;
-    font-size: 14px; /* Smaller font size for tabs */
-    margin-right: 5px;
-    text-transform: uppercase; /* Material uppercase text */
-    color: #757575; /* Material text color */
-    transition: color 0.2s; /* Material transition */
-}
-
-.tabs button:hover {
-    color: #212121; /* Material hover text color */
-}
-
-.tabs .active {
-    border-bottom: 2px solid #0d47a1; /* Material primary color */
-    color: #0d47a1; /* Material text color */
-}
-
-/* Status cell rules */
 .status-ready {
     color: #4caf50; /* Material green */
 }
@@ -96,125 +23,48 @@ tr:hover {
     margin-top: 50px;
 }
 
-/* Disabled fix button rules */
-.fix-button:disabled {
-    color: #ccc;
-    cursor: not-allowed;
+/* Padding around in-table buttons */
+td .btn-small {
+    margin: 4px;
 }
 
-/* Modal rules */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4); 
-    padding-top: 60px;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    margin: 5% auto; 
+/* Tab content rules */
+.tab-content {
+    display: none;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
-    border-radius: 8px;
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
-    position: relative;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.tab-content.active {
+    display: block;
+}
+
+/* Increase the height of the tabs */
+.tabs .tab {
+    height: 50px; /* Adjust the height as needed */
+}
+
+/* Modal rules - already handled by Materialize (if further customization needed) */
 .modal.open {
-    display: block; 
+    display: block;
 }
 
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+/* Apply the Material Icons font */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }
 
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Conflict summary table rules */
-#conflict-summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-#conflict-summary-table th, #conflict-summary-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-#conflict-summary-table th {
-    background-color: #f2f2f2;
-    text-align: left;
-    color: #333;
-}
-
-#conflict-summary-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-#conflict-summary-table tr:hover {
-    background-color: #ddd;
-}
-
-/* Button rules */
-.styled-button {
-    padding: 6px 12px; /* Material button padding */
-    font-size: 14px; /* Material button text size */
-    background-color: #2196f3; /* Material blue */
-    color: #fff;
-    border: none;
-    border-radius: 4px; /* Material border radius */
-    cursor: pointer;
-    margin: 5px;
-    transition: background-color 0.3s; /* Material transition */
-}
-
-.styled-button:hover {
-    background-color: #1976d2; /* Material hover blue */
-}
-
-.styled-button:disabled {
-    background-color: #bdbdbd; /* Material disabled color */
-    color: #757575;
-    cursor: not-allowed;
-}
-
-.button-group {
-    margin-top: 10px;
-}
-
-/* Help button rules */
-#help-button {
-    background-color: #4caf50; /* Material green */
-    position: fixed; /* Fixed positioning */
-    bottom: 20px; /* Position the button 20px from the bottom */
-    right: 20px; /* Position the button 20px from the right */
-    padding: 10px 15px;
-    font-size: 14px;
-    color: #fff;
-    border: none;
-    border-radius: 50%; /* Circular button */
-    cursor: pointer;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Material shadow */
-    z-index: 1000; /* Ensure the button stays above other elements */
-}
-
-/* Hover effect for help button */
-#help-button:hover {
-    background-color: #388e3c; /* Material darker green */
-}

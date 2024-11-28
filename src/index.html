@@ -4,6 +4,8 @@
 
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
@@ -31,142 +33,33 @@
     </div>
 
     <div id="mainView">
-		
-		<div id="loading-indicator" style="display: none;">
-        Loading... This can take a minute or more 
-    </div>
-    <div id="table-tabs">
-    <!-- Tables for different metadata types will be dynamically created here -->
-    </div>
-    <button class="styled-button" id="help-button">Help</button> 
-    <div id="conflict-summary-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span> 
-            <h2>Conflict Summary</h2>
-            <div id="conflict-summary-table-summary"></div>
-            <p>Objects with conflicts are listed in the table below (if applicable)</p>
-            <table id="conflict-summary-table">
-                <thead>
-                    <tr>
-                        <th>Object Name</th>
-                        <th>Object ID</th>
-                        <th>Conflicting Property</th>
-                        <th>Conflicting Object ID</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div id="loading-indicator" class="progress" style="display: none;">
+            <div class="determinate" style="width: 0%"></div>
+        </div>
+        <div id="table-tabs" class="section" style="padding: 4px">
+            <!-- Tables for different metadata types will be dynamically created here -->
+        </div>
+
+        <div id="conflict-summary-modal" class="modal">
+            <div class="modal-content">
+                <h4>Conflict Summary</h4>
+                <span class="modal-close right modal-trigger"><i class="material-icons">close</i></span>
+                <div id="conflict-summary-table-summary"></div>
+                <p>Objects with conflicts are listed in the table below (if applicable)</p>
+                <table id="conflict-summary-table" class="highlight responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Object Name</th>
+                            <th>Object ID</th>
+                            <th>Conflicting Property</th>
+                            <th>Conflicting Object ID</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <div id="help-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeHelpModal()">&times;</span> 
-            <h1>Help and instructions for Whitespace Cleaner!</h1>
-            <p><i>It is crucial to first run this tool in a development or test environment</i> to ensure that there are no disruptions to your production environment.</p>
-            <h2>
-                Key Features 
-            </h2>
-            <ol>
-                <li><i>Check and Fix Buttons:</i> Each metadata entry has individual “Check” and “Fix” buttons.</li>
-                <li><i>Batch Actions:</i> Selected entries can be checked and fixed in batches using the “Check Selected” and “Fix Selected” buttons.</li>
-                <li><i>Conflict Identification:</i> Highlights conflicts such as duplicate names, short names, or codes.</li>
-                <li><i>User Feedback:</i> Provides visual status updates on the readiness and conflicts of each entry.</li>
-            </ol>
-            <h2>
-                Getting Started 
-            </h2>
-            <ol>
-                <li><i>Launch the Tool:</i> Open the Whitespace Cleaner Tool in your web browser.</li>
-                <li><i>Environment Setup:</i> Always start by working in a development or test environment.</li>
-                <li><i>Initial Data Fetch:</i> The tool will automatically fetch metadata types (e.g., name, code, description) and display them in separate tabs.</li>
-            </ol>
-            <h2>
-                Using the Tool 
-            </h2>
-            <h3>
-                Tabs and Navigation 
-            </h3>
-            <ul>
-                <li><i>Tabs:</i> Each metadata type is represented by a tab.</li>
-                <li><i>Active Tab:</i> Click on a tab to view its contents. The active tab is highlighted.</li>
-            </ul>
-            <h3>
-                Viewing Metadata 
-            </h3>
-            <ol>
-                <li><i>Select Tab:</i> Click on the tab corresponding to the metadata type you want to view.</li>
-                <li><i>Table View:</i> Metadata entries are displayed in a table format with columns for ID, Name, Short Name, Code, and Description.</li>
-                <li><i>Selecting Rows:</i> Use the checkboxes to select specific rows for batch actions.</li>
-            </ol>
-            <h3>
-                Individual Actions 
-            </h3>
-            <ol>
-                <li><i>Check Individual Entries:</i> 
-                <ul>
-                    <li>Click the “Check” button next to an entry to check for conflicts.</li>
-                    <li>The status cell will update to show if the entry is ready or if there are conflicts.</li>
-                </ul>
-                </li>
-                <li><i>Fix Individual Entries:</i> 
-                <ul>
-                    <li>If the status is “Ready,” click the “Fix” button to clean the metadata.</li>
-                </ul>
-                </li>
-            </ol>
-            <h3>
-                Batch Actions 
-            </h3>
-            <ol>
-                <li><i>Check Selected Entries:</i> 
-                <ul>
-                    <li>Select rows using the checkboxes.</li>
-                    <li>Click the “Check Selected” button to check all selected rows for conflicts.</li>
-                    <li>The status cells will update accordingly.</li>
-                </ul>
-                </li>
-                <li><i>Fix Selected Entries:</i> 
-                <ul>
-                    <li>Ensure all selected rows are marked as “Ready.”</li>
-                    <li>Click the “Fix Selected” button to clean metadata for all ready entries.</li>
-                </ul>
-                </li>
-            </ol>
-            <h3>
-                Status Indicators 
-            </h3>
-            <ul>
-                <li><i>Conflicts:</i> If conflicts are found, details will be displayed, and the status will be marked as “Conflict.”</li>
-                <li><i>Ready:</i> If no conflicts are found, the status will be marked as “Ready.”</li>
-            </ul>
-            <h3>
-                Handling Empty Tables 
-            </h3>
-            <ul>
-                <li>When all entries of a type are fixed and the table is empty, the corresponding tab will be removed.</li>
-                <li>Focus will shift to the previous tab.</li>
-                <li>If no tabs remain, a “Success!” message will be displayed.</li>
-            </ul>
-            <h2>
-                Best Practices 
-            </h2>
-            <ol>
-                <li><i>Development or Test Environment:</i> Always begin by running the tool in a development or test environment.</li>
-                <li><i>Review Conflicts:</i> Carefully review and resolve conflicts before fixing multiple entries.</li>
-                <li><i>Batch Processing:</i> Utilize batch actions for efficiency but verify readiness status before applying fixes.</li>
-            </ol>
-            <h2>
-                Troubleshooting 
-            </h2>
-            <ul>
-                <li><i>Conflicts Found:</li>
-                If conflicts are detected, resolve duplicate names, short names, or codes before proceeding.</li>
-                <li><i>Errors During Fixing:</i> Review error messages and ensure entries are marked as “Ready” before retrying fixes.</li>
-            </ul>
-        </div>
-    </div>
-
-
     </div>
 </body>
 

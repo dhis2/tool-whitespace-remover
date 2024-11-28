@@ -7,12 +7,15 @@ import $ from "jquery"; //eslint-disable-line
 //CSS
 import "./css/style.css";
 import "./css/header.css";
+import "materialize-css/dist/css/materialize.min.css";
+import M from "materialize-css";
+
 
 
 // Function to highlight leading, trailing, and double spaces
 function highlightSpaces(string) {
     if (string) {
-        return string.replace(/(^\s+)|(\s+$)|(\s\s+)/g, "<span class=\"highlight\">$&</span>");
+        return string.replace(/(^\s+)|(\s+$)|(\s{2,})/g, "<span class=\"whitespace-highlight\">$&</span>");
     }
     return string;
 }
@@ -24,6 +27,7 @@ function quoteString(string) {
 
 async function fetchAndRenderMetadata() {
     $("#loading-indicator").show(); // Show loading indicator
+    $(".determinate").css("width", "50%"); // Update progress
 
     try {
         var requests = [];
@@ -39,7 +43,7 @@ async function fetchAndRenderMetadata() {
 
         const responses = await Promise.all(requests);
 
-        $("#loading-indicator").hide(); // Hide loading indicator
+        $(".determinate").css("width", "70%"); // Update progress
 
         var mergedData = {};
         responses.forEach(function (data) {
@@ -57,28 +61,33 @@ async function fetchAndRenderMetadata() {
 
         renderTables(mergedData);
         createTabs(Object.keys(mergedData));
+
+        $(".determinate").css("width", "100%"); // Update progress
+        $("#loading-indicator").fadeOut(); // Hide loading indicator
     } catch (err) {
         console.error("Error fetching metadata:", err);
+        $("#loading-indicator").fadeOut(); // Hide loading indicator on error
     }
 }
+
 
 
 function renderTables(data) {
     $("#table-tabs").empty();
     for (var type in data) {
         var objects = data[type];
-        var $table = $("<table>").append(
+        var $table = $("<table class=\"highlight striped\">").append(
             $("<thead>").append(
                 `<tr>
-                        <th><input type="checkbox" onclick="selectAll('${type}', this)"></th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Short Name</th>
-                        <th>Code</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                        <th>Status</th>
-                    </tr>`
+                    <th><label><input type="checkbox" onclick="selectAll('${type}', this)"/><span></span></label></th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Short Name</th>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                    <th>Status</th>
+                </tr>`
             ),
             $("<tbody>", { id: `${type}-body` })
         );
@@ -90,51 +99,61 @@ function renderTables(data) {
             var description = obj.description ? quoteString(highlightSpaces(obj.description)) : "";
 
             var row = $(`<tr data-id="${obj.id}" data-type="${type}">`).append(
-                `<td><input type="checkbox" class="row-checkbox" onclick="updateFixButton('${type}')"></td>
-                    <td>${obj.id}</td>
-                    <td>${name}</td>
-                    <td>${shortName}</td>
-                    <td>${code}</td>
-                    <td>${description}</td>
-                    <td>
-                        <button class="styled-button check-button" onclick="checkConflicts('${type}', '${obj.id}')">Check</button>
-                        <button class="styled-button fix-button" onclick="fixObject('${type}', '${obj.id}')" disabled>Fix</button>
-                    </td>
-                    <td class="status-cell"></td>`
+                `<td><label><input type="checkbox" class="row-checkbox" onclick="updateFixButton('${type}')"/><span></span></label></td>
+                <td>${obj.id}</td>
+                <td>${name}</td>
+                <td>${shortName}</td>
+                <td>${code}</td>
+                <td>${description}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-small waves-effect waves-light blue check-button" onclick="checkConflicts('${type}', '${obj.id}')">Check</button>
+                        <button class="btn-small waves-effect waves-light green fix-button" onclick="fixObject('${type}', '${obj.id}')" disabled>Fix</button>
+                    </div>
+                </td>
+                <td class="status-cell"></td>`
             );
             $table.find("tbody").append(row);
         });
 
         var $container = $("<div>", { class: "table-container", id: `${type}-container` }).append(
-            `<h2>${type.charAt(0).toUpperCase() + type.slice(1)}</h2>`,
+            `<h5>${type.charAt(0).toUpperCase() + type.slice(1)}</h5>`,
             $table,
-            `<div class="button-group">
-                <button class="styled-button"  onclick="checkAll('${type}')">Check Selected</button>
-                <button class="styled-button"  id="fix-all-${type}" class="fix-button" onclick="fixAll('${type}')" disabled>Fix Selected</button>
+            `<div style="padding-top: 12px"; class="button-group">
+                <button class="btn-large waves-effect waves-light yellow darken-2" onclick="checkAll('${type}')">Check Selected</button>
+                <button class="btn-large waves-effect waves-light green" id="fix-all-${type}" class="fix-button" onclick="fixAll('${type}')" disabled>Fix Selected</button>
             </div>`
         );
 
         $("#table-tabs").append($container);
     }
+    M.AutoInit(); // Initialize all Materialize elements
 }
+
+
+
 
 
 function createTabs(types) {
-    var $tabs = $("<div class=\"tabs\">");
-    types.forEach(function (type, idx) {
-        var $button = $(`<button class="${idx === 0 ? "active" : ""}" onclick="openTab('${type}')">${type.charAt(0).toUpperCase() + type.slice(1)}</button>`);
-        $tabs.append($button);
-        if (idx === 0) {
-            $(`#${type}-container`).addClass("active");
-        }
+    var $tabs = $("<ul class=\"tabs\">");
+    types.forEach(function (type) {
+        var $tab = $(`<li class="tab col s3"><a href="#${type}-container">${type.charAt(0).toUpperCase() + type.slice(1)}</a></li>`);
+        $tabs.append($tab);
     });
     $("#table-tabs").before($tabs);
+    setTimeout(() => M.Tabs.init($(".tabs")), 100); // Allow elements to be added before initialization
 }
 
+
+
+
 function openTab(type) {
-    $(".tabs button").removeClass("active");
-    $(`.tabs button:contains(${type.charAt(0).toUpperCase() + type.slice(1)})`).addClass("active");
+    // Remove active class from all tabs and tab contents
+    $(".tabs .tab a").removeClass("active");
     $(".table-container").removeClass("active");
+
+    // Add active class to the selected tab and tab content
+    $(`.tabs a[href='#${type}-container']`).addClass("active");
     $(`#${type}-container`).addClass("active");
 }
 
@@ -250,19 +269,18 @@ function showModal(conflictsSummary, noConflictCount) {
     });
 
     $summaryLine.text(`${noConflictCount} rows did not have any conflicts.`);
-
-    $modal.show();
+    console.log($modal);
+    var instance = M.Modal.getInstance($modal[0]);
+    instance.open();
 
     // Scroll to top of the page
     document.getElementById("conflict-summary-modal").scrollIntoView();
 }
 
 function closeModal() {
-    $("#conflict-summary-modal").hide();
-}
-
-function closeHelpModal() {
-    $("#help-modal").removeClass("open");
+    var $modal = $("#conflict-summary-modal");
+    var instance = M.Modal.getInstance($modal[0]);
+    instance.close();
 }
 
 function checkAll(type) {
@@ -494,17 +512,19 @@ function selectAll(type, checkbox) {
 }
 
 
-$(document).ready(function () {
+$(function () {
     fetchAndRenderMetadata();
 
-    $("#help-button").click(function () {
-        $("#help-modal").addClass("open");
+    $(".modal-close").on("click", function () {
+        var instance = M.Modal.getInstance($(this).closest(".modal")[0]);
+        instance.close();
     });
 
-    $(".close-button").click(function () {
-        closeHelpModal();
-    });
+    M.Modal.init($(".modal"), { dismissible: true });
+    M.Tabs.init($(".tabs"));
+    M.AutoInit(); // Initialize all Materialize elements
 });
+
 
 // Expose functions to the global scope
 window.highlightSpaces = highlightSpaces;
@@ -517,7 +537,6 @@ window.checkConflicts = checkConflicts;
 window.fixObject = fixObject;
 window.showModal = showModal;
 window.closeModal = closeModal;
-window.closeHelpModal = closeHelpModal;
 window.checkAll = checkAll;
 window.checkConflictsSummary = checkConflictsSummary;
 window.updateFixButton = updateFixButton;
@@ -526,3 +545,4 @@ window.fixAll = fixAll;
 window.checkRemainingRows = checkRemainingRows;
 window.fixObjectSummary = fixObjectSummary;
 window.selectAll = selectAll;
+
