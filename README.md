@@ -1,8 +1,12 @@
-# Whitespace Cleaner
-DHIS2 app to remove trailing, leading and double white space in metadata (name, shortName, description, code properties).
+# Whitespace Cleaner Tool
+Tool to remove trailing, leading and double white space in metadata (name, shortName, description, code properties).
+
+> **WARNING**
+> This tool is intended to be used by system administrators to perform specific tasks, it is not intended for end users. It is available as a DHIS2 app, but has not been through the same rigorous testing as normal core apps. It should be used with care, and always tested in a development environment.
+
 
 ## License
-© Copyright HISP Centre
+© Copyright University of Oslo 2024
 
 
 ## Getting started

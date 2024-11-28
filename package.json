@@ -1,6 +1,6 @@
 {
-  "name": "dhis2_space-out",
-  "description": "DHIS2 App for identifying and removing leading, trailing and double whitespace in metadata",
+  "name": "tool-whitespace-cleaner",
+  "description": "Tool for identifying and removing leading, trailing and double whitespace in metadata",
   "version": "0.1.0",
   "dependencies": {
     "jquery": "^3.7.1"
@@ -40,7 +40,7 @@
       "48": "./img/icons/app_logo_48x48.png",
       "96": "./img/icons/app_logo_96x96.png"
     },
-    "name": "Whitespace Cleaner",
+    "name": "Whitespace Cleaner Tool",
     "version": "0.1.0",
     "appType": "APP"
   }
