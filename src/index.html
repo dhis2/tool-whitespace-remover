@@ -42,10 +42,9 @@
 
         <div id="conflict-summary-modal" class="modal">
             <div class="modal-content">
-                <h4>Conflict Summary</h4>
+                <h4>Summary</h4>
                 <span class="modal-close right modal-trigger"><i class="material-icons">close</i></span>
                 <div id="conflict-summary-table-summary"></div>
-                <p>Objects with conflicts are listed in the table below (if applicable)</p>
                 <table id="conflict-summary-table" class="highlight responsive-table">
                     <thead>
                         <tr>
@@ -59,7 +58,24 @@
                 </table>
             </div>
         </div>
-    </div>
+
+        <div id="import-results-modal" class="modal">
+            <div class="modal-content">
+                <h4>Import Results</h4>
+                <span class="modal-close right modal-trigger"><i class="material-icons">close</i></span>
+                <div id="import-results-summary"></div>
+                <table id="import-errors-table" class="highlight responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Object Name</th>
+                            <th>Object ID</th>
+                            <th>Error Message</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 

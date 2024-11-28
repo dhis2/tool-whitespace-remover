@@ -160,6 +160,8 @@ function openTab(type) {
 async function checkConflicts(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
+    var conflictsSummary = [];
+    var importErrors = [];
     /* eslint-disable no-useless-escape */
     var name = row.find("td:nth-child(3)").text()
         .replace(/^\"/, "") // Remove leading quote
@@ -184,7 +186,6 @@ async function checkConflicts(type, id) {
     var encodedShortName = encodeURIComponent(shortName);
     var encodedCode = encodeURIComponent(code);
 
-
     var requests = [];
     var conflicts = {};
 
@@ -192,21 +193,21 @@ async function checkConflicts(type, id) {
         requests.push(
             d2Get(`/api/${endpoint}.json?filter=name:eq:${encodedName}&filter=id:!eq:${id}&fields=id,name`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["name"] = data[endpoint];
-            })
+            }).catch(err => console.error(err.message))
         );
     }
     if (shortName) {
         requests.push(
             d2Get(`/api/${endpoint}.json?filter=shortName:eq:${encodedShortName}&filter=id:!eq:${id}&fields=id,shortName`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["shortName"] = data[endpoint];
-            })
+            }).catch(err => console.error(err.message))
         );
     }
     if (code) {
         requests.push(
             d2Get(`/api/${endpoint}.json?filter=code:eq:${encodedCode}&filter=id:!eq:${id}&fields=id,code`).then(data => {
                 if (data[endpoint] && data[endpoint].length > 0) conflicts["code"] = data[endpoint];
-            })
+            }).catch(err => console.error(err.message))
         );
     }
 
@@ -215,11 +216,28 @@ async function checkConflicts(type, id) {
     if (Object.keys(conflicts).length > 0) {
         row.find(".status-cell").text("Conflict").addClass("status-conflict").removeClass("status-ready status-error");
         row.find(".row-checkbox").prop("checked", false);
-        alert("Conflicts found: " + JSON.stringify(conflicts, null, 2));
+        for (var field in conflicts) {
+            if (field !== "id" && field !== "objectName") {
+                conflicts[field].forEach(conflict => {
+                    conflictsSummary.push({
+                        objectName: name,
+                        id,
+                        property: field.charAt(0).toUpperCase() + field.slice(1),
+                        conflictingObjectId: conflict.id
+                    });
+                });
+            }
+        }
     } else {
         row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
         row.find(".fix-button").prop("disabled", false);
         row.find(".row-checkbox").prop("checked", true);
+    }
+
+    if (conflictsSummary.length > 0) {
+        showConflictSummaryModal(conflictsSummary, 0, 1);
+    } else {
+        showConflictSummaryModal([], 1, 0);
     }
     updateFixAllButton(type);
 }
@@ -227,9 +245,11 @@ async function checkConflicts(type, id) {
 async function fixObject(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
+    var importErrors = [];
+    var data = {};
 
     try {
-        let data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
+        data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
         if (data.name) data.name = data.name.replace(/\s\s+/g, " ").trim();
         if (data.shortName) data.shortName = data.shortName.replace(/\s\s+/g, " ").trim();
         if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
@@ -245,36 +265,80 @@ async function fixObject(type, id) {
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
         row.find(".fix-button").prop("disabled", true);
         row.find(".row-checkbox").prop("checked", false);
-        alert("Update failed");
+        importErrors.push({ name: data.name, id, message: err.message });
         console.error(err);
+    }
+
+    if (importErrors.length > 0) {
+        showImportResultsModal("Update of ${data.name} failed.", importErrors);
     }
 }
 
 
-function showModal(conflictsSummary, noConflictCount) {
+function showConflictSummaryModal(conflictsSummary, noConflictCount, conflictCount) {
     var $modal = $("#conflict-summary-modal");
     var $tableBody = $("#conflict-summary-table tbody");
     var $summaryLine = $("#conflict-summary-table-summary");
+    var $description = $("#conflict-summary-table-description");
+    var $table = $("#conflict-summary-table");
 
     $tableBody.empty(); // Clear the table body
 
-    conflictsSummary.forEach(function (conflict) {
-        var row = `<tr>
-                <td>${conflict.objectName}</td>
-                <td>${conflict.id}</td>
-                <td>${conflict.property}</td>
-                <td>${conflict.conflictingObjectId}</td>
-            </tr>`;
-        $tableBody.append(row);
-    });
+    if (conflictsSummary.length > 0) {
+        conflictsSummary.forEach(function (conflict) {
+            var row = `<tr>
+                    <td>${conflict.objectName}</td>
+                    <td>${conflict.id}</td>
+                    <td>${conflict.property}</td>
+                    <td>${conflict.conflictingObjectId}</td>
+                </tr>`;
+            $tableBody.append(row);
+        });
+        $description.show();
+        $table.show();
+        $summaryLine.text(`${noConflictCount} rows did not have any conflicts, ${conflictCount} rows had one or more conflicts.`);
+    } else {
+        $description.hide();
+        $table.hide();
+        $summaryLine.text(`${noConflictCount} rows did not have any conflicts.`);
+    }
 
-    $summaryLine.text(`${noConflictCount} rows did not have any conflicts.`);
     console.log($modal);
     var instance = M.Modal.getInstance($modal[0]);
     instance.open();
 
     // Scroll to top of the page
     document.getElementById("conflict-summary-modal").scrollIntoView();
+}
+
+function showImportResultsModal(importResults, importErrors = []) {
+    var $modal = $("#import-results-modal");
+    var $importResultsSummary = $("#import-results-summary");
+    var $errorsTableBody = $("#import-errors-table tbody");
+
+    $importResultsSummary.text(importResults);
+    $errorsTableBody.empty();
+
+    if (importErrors.length > 0) {
+        importErrors.forEach(function (error) {
+            var row = `<tr>
+                    <td>${error.name}</td>
+                    <td>${error.id}</td>
+                    <td>${error.message}</td>
+                </tr>`;
+            $errorsTableBody.append(row);
+        });
+        $("#import-errors-table").show();
+    } else {
+        $("#import-errors-table").hide();
+    }
+
+    console.log($modal);
+    var instance = M.Modal.getInstance($modal[0]);
+    instance.open();
+
+    // Scroll to top of the page
+    document.getElementById("import-results-modal").scrollIntoView();
 }
 
 function closeModal() {
@@ -311,8 +375,9 @@ function checkAll(type) {
     (function processNextBatch() {
         if (batches.length === 0) {
             // All batches processed
-            var noConflictCount = totalChecked - conflictsSummary.length;
-            showModal(conflictsSummary, noConflictCount);
+            var uniqueConflictIds = [...new Set(conflictsSummary.map(conflict => conflict.id))];
+            var noConflictCount = totalChecked - uniqueConflictIds.length;
+            showConflictSummaryModal(conflictsSummary, noConflictCount, uniqueConflictIds.length);
             return;
         }
         var batch = batches.shift();
@@ -443,22 +508,26 @@ function fixAll(type) {
     var $rows = $(`#${type}-body tr:has(.row-checkbox:checked)`);
     var totalFixed = 0;
     var totalFailed = 0;
+    var importErrors = [];
 
     var requests = $rows.map(function () {
         if ($(this).find(".row-checkbox").is(":checked") && $(this).find(".status-cell").text() === "Ready") {
             var id = $(this).data("id");
-            return fixObjectSummary(type, id).then(function (success) {
+            var name = $(this).find("td:nth-child(3)").text();
+            return fixObjectSummary(type, id, name).then(function (success) {
                 if (success) {
                     totalFixed++;
                 } else {
                     totalFailed++;
+                    importErrors.push({ name, id, message: "Failed to update" });
                 }
             });
         }
     }).get();
 
     $.when(...requests).then(() => {
-        alert(`Batch fix completed: ${totalFixed} objects fixed, ${totalFailed} objects failed.`);
+        var importResults = `${totalFixed} objects fixed, ${totalFailed} objects failed.`;
+        showImportResultsModal(importResults, importErrors);
         checkRemainingRows(type);
     });
 }
@@ -466,23 +535,28 @@ function fixAll(type) {
 function checkRemainingRows(type) {
     var $rows = $(`#${type}-body tr`);
     if ($rows.length === 0) {
-        var $tabButton = $(`.tabs button:contains(${type.charAt(0).toUpperCase() + type.slice(1)})`);
+        var $tabButton = $(`.tabs a[href='#${type}-container']`).parent();
         var currentIndex = $tabButton.index();
         $tabButton.remove();
         $(`#${type}-container`).remove();
 
-        var $tabs = $(".tabs button");
+        var $tabs = $(".tabs .tab a");
         if ($tabs.length > 0) {
-            $tabs.eq(Math.max(currentIndex - 1, 0)).addClass("active").trigger("click");
+            var nextTab = $tabs.eq(Math.min(currentIndex, $tabs.length - 1));
+            nextTab.addClass("active").trigger("click");
+            var nextTabId = nextTab.attr("href").substring(1);
+            $(`#${nextTabId}`).addClass("active");
+            M.Tabs.getInstance($(".tabs")).select(nextTabId); // Ensure the content is rendered
         } else {
             $("#table-tabs").html("<div class=\"success-message\">Success!</div>");
         }
     }
 }
 
-async function fixObjectSummary(type, id) {
+async function fixObjectSummary(type, id, name) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
+    var importErrors = [];
 
     try {
         let data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
@@ -500,6 +574,8 @@ async function fixObjectSummary(type, id) {
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
         row.find(".fix-button").prop("disabled", true);
         row.find(".row-checkbox").prop("checked", false);
+        importErrors.push({ name, id, message: err.message });
+        showImportResultsModal("Some objects failed to update.", importErrors);
         console.error("Update failed", err);
         return false;
     }
@@ -535,7 +611,8 @@ window.createTabs = createTabs;
 window.openTab = openTab;
 window.checkConflicts = checkConflicts;
 window.fixObject = fixObject;
-window.showModal = showModal;
+window.showConflictSummaryModal = showConflictSummaryModal;
+window.showImportResultsModal = showImportResultsModal;
 window.closeModal = closeModal;
 window.checkAll = checkAll;
 window.checkConflictsSummary = checkConflictsSummary;
