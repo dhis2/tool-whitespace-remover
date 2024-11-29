@@ -1,15 +1,14 @@
 "use strict";
 
 //JS
-import { d2Get, d2PutJson } from "./js/d2api.js"; // Assuming d2Get and d2PostJson are stored in api.js
-import $ from "jquery"; //eslint-disable-line
+import { d2Get, d2PutJson } from "./js/d2api.js";
+import $ from "jquery";
+import M from "materialize-css";
 
 //CSS
 import "./css/style.css";
 import "./css/header.css";
 import "materialize-css/dist/css/materialize.min.css";
-import M from "materialize-css";
-
 
 
 // Function to highlight leading, trailing, and double spaces
@@ -592,13 +591,21 @@ function selectAll(type, checkbox) {
 $(function () {
     fetchAndRenderMetadata();
 
-    $(".modal-close").on("click", function () {
-        var instance = M.Modal.getInstance($(this).closest(".modal")[0]);
-        instance.close();
+    // Event delegation for dynamically added elements
+    $(document).on("click", ".modal-close", function () {
+        var modal = $(this).closest(".modal")[0];
+        console.log(modal);
+        if (modal) {
+            var instance = M.Modal.getInstance(modal);
+            if (instance) {
+                instance.close();
+            }
+        }
     });
 
-    M.Modal.init($(".modal"), { dismissible: true });
-    M.Tabs.init($(".tabs"));
+    // Initialize modals
+    M.Modal.init(document.querySelectorAll(".modal"), { dismissible: true });
+    M.Tabs.init(document.querySelectorAll(".tabs"));
     M.AutoInit(); // Initialize all Materialize elements
 });
 
@@ -607,6 +614,7 @@ $(function () {
 window.fetchAndRenderMetadata = fetchAndRenderMetadata;
 window.checkConflicts = checkConflicts;
 window.fixObject = fixObject;
+window.updateFixButton = updateFixButton;
 window.checkAll = checkAll;
 window.fixAll = fixAll;
 window.selectAll = selectAll;
