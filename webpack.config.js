@@ -88,11 +88,14 @@ const webpackConfig = {
     devServer: {
         port: devServerPort,
         compress: true,
-        proxy: {
-            "/api": dhisConfig.baseUrl,
-        },
-        client: {
-            overlay: false}
+        proxy: [
+            {
+                context: ["/api"],
+                target: dhisConfig.baseUrl,
+                secure: false,
+                changeOrigin: true
+            }
+        ]
     },
     mode: "development"
 };
