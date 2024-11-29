@@ -29,7 +29,7 @@ function quoteString(string) {
 // Fetch and render metadata
 async function fetchAndRenderMetadata() {
     $("#loading-indicator").show(); // Show loading indicator
-    $(".determinate").css("width", "50%"); // Update progress
+    $(".determinate").css("width", "0%"); // Initialize progress
 
     try {
         var requests = [];
@@ -43,9 +43,19 @@ async function fetchAndRenderMetadata() {
             );
         });
 
-        const responses = await Promise.all(requests);
+        const totalRequests = requests.length;
+        let completedRequests = 0;
 
-        $(".determinate").css("width", "70%"); // Update progress
+        const updateProgress = () => {
+            completedRequests++;
+            const progress = (completedRequests / totalRequests) * 100;
+            $(".determinate").css("width", `${progress}%`);
+        };
+
+        const responses = await Promise.all(requests.map(request => request.then(response => {
+            updateProgress();
+            return response;
+        })));
 
         var mergedData = {};
         responses.forEach(function (data) {
@@ -64,7 +74,6 @@ async function fetchAndRenderMetadata() {
         renderTables(mergedData);
         createTabs(Object.keys(mergedData));
 
-        $(".determinate").css("width", "100%"); // Update progress
         $("#loading-indicator").fadeOut(); // Hide loading indicator
     } catch (err) {
         console.error("Error fetching metadata:", err);
@@ -150,6 +159,7 @@ async function checkConflicts(type, id) {
     var row = $(`tr[data-id='${id}']`);
     var endpoint = type;
     var conflictsSummary = [];
+
     /* eslint-disable no-useless-escape */
     var name = row.find("td:nth-child(3)").text()
         .replace(/^\"/, "") // Remove leading quote
@@ -216,17 +226,14 @@ async function checkConflicts(type, id) {
                 });
             }
         }
+        showConflictSummaryModal(conflictsSummary, 0, conflictsSummary.length);
     } else {
         row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
         row.find(".fix-button").prop("disabled", false);
         row.find(".row-checkbox").prop("checked", true);
+        M.toast({html: 'No conflicts found!', classes: 'green'});
     }
 
-    if (conflictsSummary.length > 0) {
-        showConflictSummaryModal(conflictsSummary, 0, 1);
-    } else {
-        showConflictSummaryModal([], 1, 0);
-    }
     updateFixAllButton(type);
 }
 
@@ -250,6 +257,7 @@ async function fixObject(type, id) {
         row.remove();
         updateFixAllButton(type);
         checkRemainingRows(type);
+        M.toast({html: 'Object fixed successfully!', classes: 'green'});
 
     } catch (err) {
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
@@ -257,12 +265,10 @@ async function fixObject(type, id) {
         row.find(".row-checkbox").prop("checked", false);
         importErrors.push({ name: data.name, id, message: err.message });
         console.error(err);
-    }
-
-    if (importErrors.length > 0) {
-        showImportResultsModal("Update of ${data.name} failed.", importErrors);
+        showImportResultsModal(`Update of ${data.name} failed.`, importErrors);
     }
 }
+
 
 
 // Show conflict summary modal
