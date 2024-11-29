@@ -231,7 +231,7 @@ async function checkConflicts(type, id) {
         row.find(".status-cell").text("Ready").addClass("status-ready").removeClass("status-conflict status-error");
         row.find(".fix-button").prop("disabled", false);
         row.find(".row-checkbox").prop("checked", true);
-        M.toast({html: 'No conflicts found!', classes: 'green'});
+        M.toast({html: "No conflicts found!", classes: "green"});
     }
 
     updateFixAllButton(type);
@@ -257,7 +257,7 @@ async function fixObject(type, id) {
         row.remove();
         updateFixAllButton(type);
         checkRemainingRows(type);
-        M.toast({html: 'Object fixed successfully!', classes: 'green'});
+        M.toast({html: "Object fixed successfully!", classes: "green"});
 
     } catch (err) {
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
