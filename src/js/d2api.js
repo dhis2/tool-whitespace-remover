@@ -173,3 +173,31 @@ export const d2Delete = async (endpoint) => {
         throw error;
     }
 };
+
+// PATCH to API async
+export const d2Patch = async (endpoint, operations) => {
+    try {
+        endpoint = formatEndpoint(endpoint);
+
+        if (!validateUID(endpoint)) {
+            console.warn("Warning: The endpoint does not end with a valid 11-character UID");
+        }
+
+        let headers = getHeaders();
+        headers.set("Content-Type", "application/json-patch+json");
+        let response = await fetch(baseUrl + endpoint, {
+            method: "PATCH",
+            headers: headers,
+            body: JSON.stringify(operations)
+        });
+        if (!response.ok) {
+            await handleApiError(response); // Handle the error response
+        }
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("ERROR in PATCH:");
+        console.log(error);
+        throw error;
+    }
+};
