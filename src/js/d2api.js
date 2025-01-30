@@ -37,9 +37,18 @@ const validateUID = (endpoint) => {
 // Helper function to handle API errors and throw detailed error messages
 const handleApiError = async (response) => {
     let errorMessage = "Network response was not ok";
-    let errorDetail = await response.json(); // Capture the error response body text
+    let errorDetail = {};
 
-    errorMessage = errorDetail.message || errorMessage;
+    try {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            errorDetail = await response.json(); // Capture the error response body text
+            errorMessage = errorDetail.message || errorMessage;
+        }
+    } catch (e) {
+        // If response is not JSON, use the default error message
+        errorMessage = e;
+    }
 
     throw new Error(`${response.statusText} - ${errorMessage}`);
 };
