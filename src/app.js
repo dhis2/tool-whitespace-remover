@@ -1,7 +1,7 @@
 "use strict";
 
 //JS
-import { d2Get, d2PutJson } from "./js/d2api.js";
+import { d2Get, d2Patch } from "./js/d2api.js";
 import $ from "jquery";
 import M from "materialize-css";
 
@@ -10,6 +10,7 @@ import "./css/style.css";
 import "./css/header.css";
 import "materialize-css/dist/css/materialize.min.css";
 
+let mergedData = {};
 
 // Function to highlight leading, trailing, and double spaces
 function highlightSpaces(string) {
@@ -57,7 +58,7 @@ async function fetchAndRenderMetadata() {
             return response;
         })));
 
-        var mergedData = {};
+        mergedData = {};
         responses.forEach(function (data) {
             for (var key in data) {
                 if (key === "system") continue;
@@ -241,33 +242,38 @@ async function checkConflicts(type, id) {
 // Fix metadata object
 async function fixObject(type, id) {
     var row = $(`tr[data-id='${id}']`);
-    var endpoint = type;
     var importErrors = [];
-    var data = {};
+    var objectData;
 
     try {
-        data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
-        if (data.name) data.name = data.name.replace(/\s\s+/g, " ").trim();
-        if (data.shortName) data.shortName = data.shortName.replace(/\s\s+/g, " ").trim();
-        if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
-        if (data.description) data.description = data.description.replace(/\s\s+/g, " ").trim();
+        // Fetch object from mergedData
+        objectData = mergedData[type].find(obj => obj.id === id);
 
-        await d2PutJson(`/api/${endpoint}/${id}`, data);
+        const operations = [];
+        
+        if (needsCleaning(objectData.name)) operations.push({ op: "add", path: "/name", value: cleanString(objectData.name) });
+        if (needsCleaning(objectData.shortName)) operations.push({ op: "add", path: "/shortName", value: cleanString(objectData.shortName) });
+        if (needsCleaning(objectData.code)) operations.push({ op: "add", path: "/code", value: cleanString(objectData.code) });
+        if (needsCleaning(objectData.description)) operations.push({ op: "add", path: "/description", value: cleanString(objectData.description) });
+        
+        await d2Patch(`/api/${type}/${id}`, operations);
 
         row.remove();
         updateFixAllButton(type);
         checkRemainingRows(type);
-        M.toast({html: "Object fixed successfully!", classes: "green"});
+
+        M.toast({ html: "Object fixed successfully!", classes: "green" });
 
     } catch (err) {
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
         row.find(".fix-button").prop("disabled", true);
         row.find(".row-checkbox").prop("checked", false);
-        importErrors.push({ name: data.name, id, message: err.message });
+        importErrors.push({ name: objectData.name, id, message: err.message });
         console.error(err);
-        showImportResultsModal(`Update of ${data.name} failed.`, importErrors);
+        showImportResultsModal(`Update of ${objectData.name} failed.`, importErrors);
     }
 }
+
 
 
 
@@ -557,32 +563,53 @@ function checkRemainingRows(type) {
 
 
 // Fix metadata object summary
-async function fixObjectSummary(type, id, name) {
+async function fixObjectSummary(type, id) {
     var row = $(`tr[data-id='${id}']`);
-    var endpoint = type;
-    var importErrors = [];
-
+    var  objectData;
     try {
-        let data = await d2Get(`/api/${endpoint}/${id}?fields=:owner`);
-        if (data.name) data.name = data.name.replace(/\s\s+/g, " ").trim();
-        if (data.shortName) data.shortName = data.shortName.replace(/\s\s+/g, " ").trim();
-        if (data.code) data.code = data.code.replace(/\s\s+/g, " ").trim();
-        if (data.description) data.description = data.description.replace(/\s\s+/g, " ").trim();
+        // Find object by id from mergedData
+        objectData = mergedData[type].find(item => item.id === id);
 
-        await d2PutJson(`/api/${endpoint}/${id}`, data);
+        const operations = [];
+        if (needsCleaning(objectData.shortName)) operations.push({ op: "add", path: "/shortName", value: cleanString(objectData.shortName) });
+        if (needsCleaning(objectData.code)) operations.push({ op: "add", path: "/code", value: cleanString(objectData.code) });
+        if (needsCleaning(objectData.name)) operations.push({ op: "add", path: "/name", value: cleanString(objectData.name) });
+        if (needsCleaning(objectData.description)) operations.push({ op: "add", path: "/description", value: cleanString(objectData.description) });
+
+        await d2Patch(`/api/${type}/${id}`, operations);
 
         row.remove();
         return true;
 
     } catch (err) {
+        console.error("Update failed", err);
         row.find(".status-cell").text("Error").addClass("status-error").removeClass("status-ready status-conflict");
         row.find(".fix-button").prop("disabled", true);
         row.find(".row-checkbox").prop("checked", false);
-        importErrors.push({ name, id, message: err.message });
-        showImportResultsModal("Some objects failed to update.", importErrors);
-        console.error("Update failed", err);
+        showImportResultsModal("Some objects failed to update.", [{ name: objectData.name, id, message: err.message }]);
         return false;
     }
+}
+
+// Utility function to clean strings by removing leading, trailing, and multiple spaces
+function cleanString(str) {
+    if (typeof str !== "string") {
+        return str;
+    }
+    // Replace multiple spaces with a single space and trim leading/trailing spaces
+    return str.replace(/\s\s+/g, " ").trim();
+}
+
+
+// Function to check if a string needs cleaning: has leading/trailing spaces or multiple consecutive spaces
+function needsCleaning(str) {
+    // Return false if the string is null, undefined, or not a string
+    if (str === null || typeof str !== "string") {
+        return false;
+    }
+
+    // Check if the string is non-empty and contains problematic spaces
+    return /\s\s+/.test(str) || str.trim() !== str;
 }
 
 
