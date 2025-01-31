@@ -47,10 +47,10 @@ const handleApiError = async (response) => {
         }
     } catch (e) {
         // If response is not JSON, use the default error message
-        errorMessage = e;
+        errorMessage = e.message;
     }
 
-    throw new Error(`${response.statusText} - ${errorMessage}`);
+    throw new Error(`${response.status} ${response.statusText} - ${errorMessage}`);
 };
 
 // GET from API async
