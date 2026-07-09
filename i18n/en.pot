@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-07-09T12:18:19.741Z\n"
-"PO-Revision-Date: 2026-07-09T12:18:19.741Z\n"
+"POT-Creation-Date: 2026-07-09T12:37:08.231Z\n"
+"PO-Revision-Date: 2026-07-09T12:37:08.231Z\n"
 
 msgid "Conflict check failed"
 msgstr "Conflict check failed"
@@ -123,8 +123,23 @@ msgstr "Check"
 msgid "Fix"
 msgstr "Fix"
 
+msgid "{{selected}} of {{total}} objects selected"
+msgstr "{{selected}} of {{total}} objects selected"
+
+msgid "Select all {{total}} across all pages"
+msgstr "Select all {{total}} across all pages"
+
+msgid "Clear selection"
+msgstr "Clear selection"
+
+msgid "Check selected ({{n}})"
+msgstr "Check selected ({{n}})"
+
 msgid "Check selected"
 msgstr "Check selected"
+
+msgid "Fix selected ({{n}})"
+msgstr "Fix selected ({{n}})"
 
 msgid "Fix selected"
 msgstr "Fix selected"

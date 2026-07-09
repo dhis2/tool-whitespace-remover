@@ -120,7 +120,9 @@ export const MetadataTable = ({
                         <DataTableColumnHeader>
                             {i18n.t('Actions')}
                         </DataTableColumnHeader>
-                        <DataTableColumnHeader>
+                        {/* fixed width so the tag appearing doesn't reflow
+                            the other columns */}
+                        <DataTableColumnHeader width="110px">
                             {i18n.t('Status')}
                         </DataTableColumnHeader>
                     </DataTableRow>
@@ -208,6 +210,49 @@ export const MetadataTable = ({
                     }}
                 />
             </div>
+            <div className={styles.selectionBar} data-test="selection-summary">
+                <span className={styles.selectionCount}>
+                    {i18n.t('{{selected}} of {{total}} objects selected', {
+                        selected: selectedItems.length,
+                        total: items.length,
+                    })}
+                </span>
+                {items.length > pageItems.length &&
+                    selectedItems.length < items.length && (
+                        <Button
+                            small
+                            secondary
+                            dataTest="select-all-pages"
+                            disabled={busy}
+                            onClick={() =>
+                                onToggleAll(
+                                    items.map((item) => item.id),
+                                    true
+                                )
+                            }
+                        >
+                            {i18n.t('Select all {{total}} across all pages', {
+                                total: items.length,
+                            })}
+                        </Button>
+                    )}
+                {selectedItems.length > 0 && (
+                    <Button
+                        small
+                        secondary
+                        dataTest="clear-selection"
+                        disabled={busy}
+                        onClick={() =>
+                            onToggleAll(
+                                items.map((item) => item.id),
+                                false
+                            )
+                        }
+                    >
+                        {i18n.t('Clear selection')}
+                    </Button>
+                )}
+            </div>
             <div className={styles.footer}>
                 <ButtonStrip>
                     <Button
@@ -216,7 +261,11 @@ export const MetadataTable = ({
                         disabled={busy || selectedItems.length === 0}
                         onClick={onCheckSelected}
                     >
-                        {i18n.t('Check selected')}
+                        {selectedItems.length > 0
+                            ? i18n.t('Check selected ({{n}})', {
+                                  n: selectedItems.length,
+                              })
+                            : i18n.t('Check selected')}
                     </Button>
                     <Button
                         primary
@@ -224,7 +273,11 @@ export const MetadataTable = ({
                         disabled={busy || !canFixSelected}
                         onClick={onFixSelected}
                     >
-                        {i18n.t('Fix selected')}
+                        {selectedItems.length > 0 && canFixSelected
+                            ? i18n.t('Fix selected ({{n}})', {
+                                  n: selectedItems.length,
+                              })
+                            : i18n.t('Fix selected')}
                     </Button>
                 </ButtonStrip>
             </div>
