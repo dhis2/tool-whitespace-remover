@@ -35,6 +35,11 @@ pnpm run build
 
 The deployable `.zip` is written to `build/bundle/`, ready to install via App Management in DHIS2.
 
+### Test
+
+End-to-end acceptance tests (live DHIS2 instance required): see [`test/e2e/`](test/e2e/README.md).
+User manual: [`docs/MANUAL.md`](docs/MANUAL.md).
+
 ### Lint and type-check
 
 ```
