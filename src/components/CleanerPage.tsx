@@ -25,7 +25,11 @@ const typeLabel = (type: string): string => {
     return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
 
-type ConflictModalState = { conflicts: Conflict[]; checkedCount: number }
+type ConflictModalState = {
+    conflicts: Conflict[]
+    checkedCount: number
+    errorCount: number
+}
 type ResultsModalState = { fixedCount: number; errors: FixError[] }
 
 export const CleanerPage = () => {
@@ -88,7 +92,7 @@ export const CleanerPage = () => {
     const removeItems = (type: string, ids: string[]) => {
         const removed = new Set(ids)
         setItems((previous) => {
-            const remaining = previous[type].filter(
+            const remaining = (previous[type] ?? []).filter(
                 (item) => !removed.has(item.id)
             )
             const next = { ...previous }
@@ -168,7 +172,7 @@ export const CleanerPage = () => {
         if (errorCount > 0) {
             showError({ message: i18n.t('Conflict check failed') })
         } else if (conflicts.length > 0) {
-            setConflictModal({ conflicts, checkedCount: 1 })
+            setConflictModal({ conflicts, checkedCount: 1, errorCount: 0 })
         } else {
             showSuccess({ message: i18n.t('No conflicts found') })
         }
@@ -186,7 +190,11 @@ export const CleanerPage = () => {
                 toCheck,
                 toCheck
             )
-            setConflictModal({ conflicts, checkedCount: toCheck.length })
+            setConflictModal({
+                conflicts,
+                checkedCount: toCheck.length,
+                errorCount,
+            })
             if (errorCount > 0) {
                 showError({
                     message: i18n.t(
@@ -324,6 +332,7 @@ export const CleanerPage = () => {
                 <ConflictSummaryModal
                     conflicts={conflictModal.conflicts}
                     checkedCount={conflictModal.checkedCount}
+                    errorCount={conflictModal.errorCount}
                     onClose={() => setConflictModal(null)}
                 />
             )}

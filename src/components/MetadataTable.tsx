@@ -72,6 +72,7 @@ export const MetadataTable = ({
                         <DataTableColumnHeader width="48px">
                             <Checkbox
                                 dataTest="select-all"
+                                disabled={busy}
                                 checked={allSelected}
                                 indeterminate={
                                     selectedItems.length > 0 && !allSelected

@@ -33,13 +33,11 @@ Follow these steps to install the Whitespace Cleaner in your DHIS2 instance:
 ## Navigating the UI
 
 ### Header
-- **Logo**: Takes you back to the DHIS2 main page.
-- **Title**: Displays "Whitespace Cleaner".
-- **Exit Button**: Click this to exit the Whitespace Cleaner app.
+The app uses the standard DHIS2 header bar, with the usual navigation, apps menu and profile menu. The app requires DHIS2 2.41 or later.
 
 ### Main View
-- **Loading Indicator**: Appears when the app is fetching metadata.
-- **Tabs**: Different tables dynamically created here based on metadata types (e.g., Data Elements, Indicators). Scrolls horizontally if issues are found for many metadata types.
+- **Loading Indicator**: A progress bar appears while the app is scanning metadata.
+- **Tabs**: One tab per metadata type with whitespace issues (e.g., Data elements, Indicators), with the number of affected objects shown in the tab label. Scrolls horizontally if issues are found for many metadata types.
 
 ### Actions
 Selecting a Tab for an object type gives you a table with objects of that type with whitespace issues. These are highlighted in yellow. Removing the white spaces has two steps:

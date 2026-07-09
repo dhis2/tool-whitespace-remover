@@ -21,9 +21,12 @@ const cleanedValue = (
     field: 'name' | 'shortName' | 'code'
 ): string | undefined => {
     const value = item[field]
-    return typeof value === 'string' && value !== ''
-        ? cleanString(value)
-        : undefined
+    if (typeof value !== 'string') {
+        return undefined
+    }
+    const cleaned = cleanString(value)
+    // Whitespace-only values clean to '' - nothing to conflict with
+    return cleaned === '' ? undefined : cleaned
 }
 
 /**
