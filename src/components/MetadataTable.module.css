@@ -2,6 +2,10 @@
     padding-block-start: var(--spacers-dp8);
 }
 
+.pagination {
+    padding-block-start: var(--spacers-dp8);
+}
+
 .footer {
     padding-block: var(--spacers-dp12);
 }

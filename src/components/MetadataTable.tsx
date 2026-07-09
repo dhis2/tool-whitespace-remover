@@ -7,11 +7,12 @@ import {
     DataTableCell,
     DataTableColumnHeader,
     DataTableRow,
+    Pagination,
     TableBody,
     TableHead,
     Tag,
 } from '@dhis2/ui'
-import React from 'react'
+import React, { useState } from 'react'
 import styles from './MetadataTable.module.css'
 import { WhitespaceHighlight } from './WhitespaceHighlight'
 import { MetadataItem, RowStatus } from '@/types/metadata'
@@ -33,13 +34,15 @@ const StatusTag = ({ status }: { status: RowStatus }) => {
     }
 }
 
+const DEFAULT_PAGE_SIZE = 50
+
 type Props = {
     items: MetadataItem[]
     statuses: Record<string, RowStatus>
     selected: Set<string>
     busy: boolean
     onToggle: (id: string, checked: boolean) => void
-    onToggleAll: (checked: boolean) => void
+    onToggleAll: (ids: string[], checked: boolean) => void
     onCheckOne: (item: MetadataItem) => void
     onFixOne: (item: MetadataItem) => void
     onCheckSelected: () => void
@@ -58,8 +61,22 @@ export const MetadataTable = ({
     onCheckSelected,
     onFixSelected,
 }: Props) => {
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+
+    // items shrink as rows get fixed - keep the page in range
+    const pageCount = Math.max(1, Math.ceil(items.length / pageSize))
+    const currentPage = Math.min(page, pageCount)
+    const pageItems = items.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    )
+
     const selectedItems = items.filter((item) => selected.has(item.id))
-    const allSelected = items.length > 0 && selectedItems.length === items.length
+    const allPageSelected =
+        pageItems.length > 0 &&
+        pageItems.every((item) => selected.has(item.id))
+    const somePageSelected = pageItems.some((item) => selected.has(item.id))
     const canFixSelected =
         selectedItems.length > 0 &&
         selectedItems.every((item) => statuses[item.id] === 'ready')
@@ -73,12 +90,15 @@ export const MetadataTable = ({
                             <Checkbox
                                 dataTest="select-all"
                                 disabled={busy}
-                                checked={allSelected}
+                                checked={allPageSelected}
                                 indeterminate={
-                                    selectedItems.length > 0 && !allSelected
+                                    somePageSelected && !allPageSelected
                                 }
                                 onChange={({ checked }) =>
-                                    onToggleAll(checked === true)
+                                    onToggleAll(
+                                        pageItems.map((item) => item.id),
+                                        checked === true
+                                    )
                                 }
                             />
                         </DataTableColumnHeader>
@@ -106,7 +126,7 @@ export const MetadataTable = ({
                     </DataTableRow>
                 </TableHead>
                 <TableBody>
-                    {items.map((item) => {
+                    {pageItems.map((item) => {
                         const status = statuses[item.id] ?? 'unchecked'
                         return (
                             <DataTableRow key={item.id} dataTest="metadata-row">
@@ -173,6 +193,21 @@ export const MetadataTable = ({
                     })}
                 </TableBody>
             </DataTable>
+            <div className={styles.pagination}>
+                <Pagination
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageCount={pageCount}
+                    total={items.length}
+                    pageSizes={['25', '50', '100']}
+                    disabled={busy}
+                    onPageChange={(newPage: number) => setPage(newPage)}
+                    onPageSizeChange={(newSize: string | number) => {
+                        setPageSize(Number(newSize))
+                        setPage(1)
+                    }}
+                />
+            </div>
             <div className={styles.footer}>
                 <ButtonStrip>
                     <Button

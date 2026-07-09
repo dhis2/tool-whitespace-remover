@@ -56,6 +56,10 @@ export const findConflicts = async ({
             if (value === undefined) {
                 return
             }
+            // Only single-value operators (eq/!eq) are used here: the server
+            // rejoins everything after the second ':' as the value, so
+            // colons, commas and brackets in metadata values are safe.
+            // Multi-value operators (in:[...]) would not be.
             const response = await engine.query({
                 objects: {
                     resource: type,

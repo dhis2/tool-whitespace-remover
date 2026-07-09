@@ -311,17 +311,13 @@ export const CleanerPage = () => {
             </TabBar>
             {activeType && (
                 <MetadataTable
+                    key={activeType}
                     items={activeItems}
                     statuses={statuses}
                     selected={selected}
                     busy={busy}
                     onToggle={(id, checked) => setSelection([id], checked)}
-                    onToggleAll={(checked) =>
-                        setSelection(
-                            activeItems.map((item) => item.id),
-                            checked
-                        )
-                    }
+                    onToggleAll={(ids, checked) => setSelection(ids, checked)}
                     onCheckOne={handleCheckOne}
                     onFixOne={handleFixOne}
                     onCheckSelected={handleCheckSelected}

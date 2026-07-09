@@ -19,11 +19,31 @@ const buildFilters = (field: string): string[] => [
     `${field}:ilike$: `,
 ]
 
-const mergeResponses = (responses: Record<string, unknown>[]): MetadataMap => {
+type Schema = {
+    plural: string
+    metadata: boolean
+    persisted: boolean
+    relativeApiEndpoint?: string
+}
+
+// Only persisted metadata types with their own API endpoint can be patched
+// via /api/<type>/<id>; anything else (read-only/embedded types) would fail
+// at fix time, so keep it out of the scan results.
+const patchableTypes = (schemas: Schema[]): Set<string> =>
+    new Set(
+        schemas
+            .filter((s) => s.metadata && s.persisted && s.relativeApiEndpoint)
+            .map((s) => s.plural)
+    )
+
+const mergeResponses = (
+    responses: Record<string, unknown>[],
+    allowedTypes: Set<string>
+): MetadataMap => {
     const merged: MetadataMap = {}
     for (const response of responses) {
         for (const [type, value] of Object.entries(response)) {
-            if (type === 'system' || !Array.isArray(value)) {
+            if (!allowedTypes.has(type) || !Array.isArray(value)) {
                 continue
             }
             merged[type] = (merged[type] ?? []).concat(value as MetadataItem[])
@@ -31,13 +51,19 @@ const mergeResponses = (responses: Record<string, unknown>[]): MetadataMap => {
     }
     for (const type of Object.keys(merged)) {
         const seen = new Set<string>()
-        merged[type] = merged[type].filter((item) => {
-            if (seen.has(item.id) || !hasWhitespaceIssue(item)) {
-                return false
-            }
-            seen.add(item.id)
-            return true
-        })
+        merged[type] = merged[type]
+            .filter((item) => {
+                if (seen.has(item.id) || !hasWhitespaceIssue(item)) {
+                    return false
+                }
+                seen.add(item.id)
+                return true
+            })
+            .sort((a, b) =>
+                (a.name ?? '').localeCompare(b.name ?? '', undefined, {
+                    sensitivity: 'base',
+                })
+            )
         if (merged[type].length === 0) {
             delete merged[type]
         }
@@ -58,8 +84,30 @@ export const useWhitespaceScan = () => {
         ['whitespace-scan'],
         async () => {
             const filters = FILTERED_FIELDS.flatMap(buildFilters)
+            const totalRequests = filters.length + 1 // + schemas
             let completed = 0
             setProgress(0)
+            const tick = () => {
+                completed += 1
+                setProgress(completed / totalRequests)
+            }
+
+            const schemasPromise = engine
+                .query({
+                    schemas: {
+                        resource: 'schemas',
+                        params: {
+                            fields: 'plural,metadata,persisted,relativeApiEndpoint',
+                        },
+                    },
+                })
+                .then((response) => {
+                    tick()
+                    return (
+                        response.schemas as unknown as { schemas: Schema[] }
+                    ).schemas
+                })
+
             const responses = await Promise.all(
                 filters.map(async (filter) => {
                     const response = await engine.query({
@@ -68,12 +116,12 @@ export const useWhitespaceScan = () => {
                             params: { filter, fields: FIELDS },
                         },
                     })
-                    completed += 1
-                    setProgress(completed / filters.length)
+                    tick()
                     return response.metadata as Record<string, unknown>
                 })
             )
-            return mergeResponses(responses)
+            const schemas = await schemasPromise
+            return mergeResponses(responses, patchableTypes(schemas))
         },
         {
             staleTime: Infinity,
