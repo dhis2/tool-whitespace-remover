@@ -43,7 +43,7 @@ def get(base, path):
     return _req(base, "GET", path)
 
 
-def post(base, path, body, content_type="application/json"):
+def post(base, path, body, content_type=JSON_CONTENT_TYPE):
     return _req(base, "POST", path, body, content_type)
 
 
@@ -56,7 +56,7 @@ def login_cookie(base):
     req = urllib.request.Request(
         f"{base}/api/auth/login",
         data=json.dumps({"username": USER, "password": PASS}).encode(),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": JSON_CONTENT_TYPE},
         method="POST",
     )
     try:
