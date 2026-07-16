@@ -62,7 +62,7 @@ export const CleanerPage = () => {
         }
     }, [data])
 
-    const types = Object.keys(items).sort()
+    const types = Object.keys(items).sort((a, b) => a.localeCompare(b))
     const activeType =
         activeTab && types.includes(activeTab) ? activeTab : types[0]
     const activeItems = activeType ? items[activeType] : []

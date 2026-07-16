@@ -20,8 +20,11 @@ Leone and Laos demo databases (see `docs/review-2026-07/UI-TEST-RESULTS.md`).
 #    org units AgentWsOu01-02, with known whitespace/conflict issues)
 python3 seed_metadata.py http://<instance>:8080
 
-# 2. Install the built zip
-python3 install_app.py http://<instance>:8080 ../../build/bundle/whitespace-cleaner-1.0.0.zip
+# 2. Install the built zip (POST /api/apps)
+curl -u admin:district -F file=@../../build/bundle/whitespace-cleaner-1.0.0.zip \
+    "http://<instance>:8080/api/apps"
+# verify it landed (app key: whitespace-cleaner)
+curl -su admin:district "http://<instance>:8080/api/apps.json" | grep -o whitespace-cleaner | head -1
 
 # 3. Run the suite; results JSON + screenshots land in ./results/
 python3 run_suite.py http://<instance>:8080 <label>

@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react'
 import styles from './WhitespaceHighlight.module.css'
 
-const WHITESPACE_PATTERN = /(^\s+)|(\s+$)|(\s{2,})/g
+const WHITESPACE_RUN = /\s+/g
+
+// A whitespace run is problematic if it is leading, trailing, or repeated
+const isProblemRun = (value: string, index: number, run: string): boolean =>
+    index === 0 || index + run.length === value.length || run.length >= 2
 
 /**
  * Renders a metadata value in quotes, with the problematic whitespace
@@ -13,8 +17,11 @@ export const WhitespaceHighlight = ({ value }: { value?: string }) => {
     }
     const segments: ReactNode[] = []
     let last = 0
-    for (const match of value.matchAll(WHITESPACE_PATTERN)) {
+    for (const match of value.matchAll(WHITESPACE_RUN)) {
         const index = match.index ?? 0
+        if (!isProblemRun(value, index, match[0])) {
+            continue
+        }
         if (index > last) {
             segments.push(value.slice(last, index))
         }

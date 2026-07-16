@@ -5,9 +5,10 @@ import urllib.request
 import urllib.error
 
 USER, PASS = "admin", "district"
+JSON_CONTENT_TYPE = "application/json"
 
 
-def _req(base, method, path, body=None, content_type="application/json"):
+def _req(base, method, path, body=None, content_type=JSON_CONTENT_TYPE):
     url = f"{base}{path}"
     data = None
     headers = {
