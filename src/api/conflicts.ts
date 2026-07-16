@@ -13,7 +13,9 @@ const PROPERTY_LABELS: Record<string, string> = {
 
 // Names and short names must be unique per type, except for organisation
 // units. Codes must always be unique.
-const uniqueFieldsForType = (type: string): Array<'name' | 'shortName' | 'code'> =>
+const uniqueFieldsForType = (
+    type: string
+): Array<'name' | 'shortName' | 'code'> =>
     type === 'organisationUnits' ? ['code'] : ['name', 'shortName', 'code']
 
 const cleanedValue = (

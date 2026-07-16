@@ -17,7 +17,7 @@ These were found in the initial migration commit and fixed in commit
 `c86cb12` ("Fix review findings"):
 
 1. **HIGH — whitespace-only values broke the conflict check and made objects
-   unfixable.** `src/api/conflicts.ts` used a value's *raw* emptiness before
+   unfixable.** `src/api/conflicts.ts` used a value's _raw_ emptiness before
    cleaning, so a field like `code: "  "` produced `filter=code:eq:` (empty
    value). DHIS2's query parser (verified in dhis2-core 2.41
    `DefaultJpaQueryParser`) throws an NPE → HTTP 500, the row was marked
@@ -41,7 +41,7 @@ These were found in the initial migration commit and fixed in commit
    fixed).** The tables now paginate client-side (`@dhis2/ui` `Pagination`,
    25/50/100 rows per page, default 50), rows are sorted by name, and
    select-all operates on the visible page. This bounds DOM size for
-   databases with thousands of matches. The *server-side* cost is unchanged:
+   databases with thousands of matches. The _server-side_ cost is unchanged:
    9 filtered `/api/metadata` queries (the metadata export endpoint does not
    support paging) — identical to the legacy app. If server load becomes a
    problem on very large instances, the scan would need to move to per-type
@@ -89,7 +89,7 @@ The migration to the App Platform is the right architecture for this tool:
 ## Intentional behavior changes vs the legacy app
 
 1. Conflict checks now consistently skip name/shortName uniqueness for
-   organisation units. The legacy *single-object* check flagged OU name
+   organisation units. The legacy _single-object_ check flagged OU name
    duplicates that the bulk check (correctly, per DHIS2 semantics) allowed.
 2. Objects whose only whitespace issues are in non-cleanable properties are
    filtered out of the scan result instead of being listed with nothing to

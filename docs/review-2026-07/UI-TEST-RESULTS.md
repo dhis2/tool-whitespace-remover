@@ -8,14 +8,14 @@ session cookie.
 
 ## Test environment
 
-| Label | DHIS2 version | Tomcat | Database |
-|---|---|---|---|
-| 41-sl | 2.41.9 | 9 | Sierra Leone demo (v41 seed) |
-| 41-lao | 2.41.9 | 9 | Laos HMIS demo (v41 seed) |
-| 42-sl | 2.42.5.1 | 10 | Sierra Leone demo (v42 seed) |
-| 42-lao | 2.42.5.1 | 10 | Laos HMIS demo (v41 seed, Flyway-migrated) |
-| 43-sl | 2.43.0.1 | 10 | Sierra Leone demo (v43 seed) |
-| 43-lao | 2.43.0.1 | 10 | Laos HMIS demo (v41 seed, Flyway-migrated) |
+| Label  | DHIS2 version | Tomcat | Database                                   |
+| ------ | ------------- | ------ | ------------------------------------------ |
+| 41-sl  | 2.41.9        | 9      | Sierra Leone demo (v41 seed)               |
+| 41-lao | 2.41.9        | 9      | Laos HMIS demo (v41 seed)                  |
+| 42-sl  | 2.42.5.1      | 10     | Sierra Leone demo (v42 seed)               |
+| 42-lao | 2.42.5.1      | 10     | Laos HMIS demo (v41 seed, Flyway-migrated) |
+| 43-sl  | 2.43.0.1      | 10     | Sierra Leone demo (v43 seed)               |
+| 43-lao | 2.43.0.1      | 10     | Laos HMIS demo (v41 seed, Flyway-migrated) |
 
 Each instance was seeded with deterministic test objects (see
 `STATE-CHANGES.md`): a fixable data element with double/leading/trailing
@@ -29,28 +29,28 @@ sets, indicators, option sets, org units …), exercised by the bulk check.
 
 All 20 steps passed on all six version × database combinations:
 
-| Step | 41-sl | 41-lao | 42-sl | 42-lao | 43-sl | 43-lao |
-|---|---|---|---|---|---|---|
-| App loads, scan completes | PASS | PASS | PASS | PASS | PASS | PASS |
-| Data elements tab present | PASS | PASS | PASS | PASS | PASS | PASS |
-| Seeded row visible | PASS | PASS | PASS | PASS | PASS | PASS |
-| Whitespace highlighted (5 marks) | PASS | PASS | PASS | PASS | PASS | PASS |
-| Single check → Ready | PASS | PASS | PASS | PASS | PASS | PASS |
-| Single fix removes row | PASS | PASS | PASS | PASS | PASS | PASS |
-| API: name cleaned | PASS | PASS | PASS | PASS | PASS | PASS |
-| API: code cleaned | PASS | PASS | PASS | PASS | PASS | PASS |
-| API: shortName cleaned | PASS | PASS | PASS | PASS | PASS | PASS |
-| Conflict row visible | PASS | PASS | PASS | PASS | PASS | PASS |
-| Conflict modal shown | PASS | PASS | PASS | PASS | PASS | PASS |
-| Conflict lists conflicting UID | PASS | PASS | PASS | PASS | PASS | PASS |
-| Row tagged Conflict | PASS | PASS | PASS | PASS | PASS | PASS |
-| Org units tab present | PASS | PASS | PASS | PASS | PASS | PASS |
-| Seeded OU row visible | PASS | PASS | PASS | PASS | PASS | PASS |
-| OU duplicate name → no conflict | PASS | PASS | PASS | PASS | PASS | PASS |
-| OU fix removes row | PASS | PASS | PASS | PASS | PASS | PASS |
-| API: OU name cleaned | PASS | PASS | PASS | PASS | PASS | PASS |
-| Bulk check shows summary modal | PASS | PASS | PASS | PASS | PASS | PASS |
-| Fix-selected state resolved | PASS | PASS | PASS | PASS | PASS | PASS |
+| Step                             | 41-sl | 41-lao | 42-sl | 42-lao | 43-sl | 43-lao |
+| -------------------------------- | ----- | ------ | ----- | ------ | ----- | ------ |
+| App loads, scan completes        | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Data elements tab present        | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Seeded row visible               | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Whitespace highlighted (5 marks) | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Single check → Ready             | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Single fix removes row           | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| API: name cleaned                | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| API: code cleaned                | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| API: shortName cleaned           | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Conflict row visible             | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Conflict modal shown             | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Conflict lists conflicting UID   | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Row tagged Conflict              | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Org units tab present            | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Seeded OU row visible            | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| OU duplicate name → no conflict  | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| OU fix removes row               | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| API: OU name cleaned             | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Bulk check shows summary modal   | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
+| Fix-selected state resolved      | PASS  | PASS   | PASS  | PASS   | PASS  | PASS   |
 
 The "API: … cleaned" steps verify server state after the fix via the Web API
 (JSON-patch applied correctly), not just the UI.

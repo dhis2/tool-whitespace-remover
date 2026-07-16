@@ -38,10 +38,7 @@ export const ConflictSummaryModal = ({
                     {i18n.t(
                         '{{ok}} object(s) did not have any conflicts, {{bad}} object(s) had one or more conflicts.',
                         {
-                            ok:
-                                checkedCount -
-                                conflictingIds.size -
-                                errorCount,
+                            ok: checkedCount - conflictingIds.size - errorCount,
                             bad: conflictingIds.size,
                         }
                     )}

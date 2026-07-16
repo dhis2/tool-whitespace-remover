@@ -18,20 +18,20 @@
 
 Created and **deleted** (nothing left running):
 
-| Instance | Version/Tomcat | Seed | Outcome |
-|---|---|---|---|
-| `agent-ws-41-sl` (1st attempt) | 41 / Tomcat 10 (broker default) | SL v41 | Misconfigured (2.41 needs Tomcat 9); deleted |
-| `agent-ws-41-lao` (1st attempt) | 41 / Tomcat 10 | Laos v41 | Same; deleted |
-| `agent-ws-probe` | 41 | — | Accidentally created while probing the create API's field validation; deleted immediately |
-| `agent-ws-41-sl` | 2.41.9 / Tomcat 9 | SL v41 | Tested; deleted |
-| `agent-ws-41-lao` | 2.41.9 / Tomcat 9 | Laos v41 | Tested; deleted |
-| `agent-ws-42-sl` | 2.42.5.1 / Tomcat 10 | SL v42 | Tested; deleted |
-| `agent-ws-42-lao` | 2.42.5.1 / Tomcat 10 | Laos v41 (Flyway-migrated) | Tested; deleted |
-| `agent-ws-43-sl` | 2.43.0.1 / Tomcat 10 | SL v43 | Tested; deleted |
-| `agent-ws-43-lao` | 2.43.0.1 / Tomcat 10 | Laos v41 (Flyway-migrated) | Tested; deleted |
-| `agent-ws-41-sl` (re-validation) | 2.41.9 / Tomcat 9 | SL v41 | Re-tested follow-up fixes (21/21); deleted |
-| `agent-ws-43-sl` (manual testing) | 2.43.0.1 / Tomcat 10 | SL v43 | Manual testing via dev server (CORS whitelist extended with http://localhost:49210, not reverted - instance deleted); deleted at end of review |
-| `agent-ws-41-manual` (manual testing) | 2.41.9 / Tomcat 9 | SL v41 | Manual testing with installed app zip; deleted at end of review |
+| Instance                              | Version/Tomcat                  | Seed                       | Outcome                                                                                                                                        |
+| ------------------------------------- | ------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-ws-41-sl` (1st attempt)        | 41 / Tomcat 10 (broker default) | SL v41                     | Misconfigured (2.41 needs Tomcat 9); deleted                                                                                                   |
+| `agent-ws-41-lao` (1st attempt)       | 41 / Tomcat 10                  | Laos v41                   | Same; deleted                                                                                                                                  |
+| `agent-ws-probe`                      | 41                              | —                          | Accidentally created while probing the create API's field validation; deleted immediately                                                      |
+| `agent-ws-41-sl`                      | 2.41.9 / Tomcat 9               | SL v41                     | Tested; deleted                                                                                                                                |
+| `agent-ws-41-lao`                     | 2.41.9 / Tomcat 9               | Laos v41                   | Tested; deleted                                                                                                                                |
+| `agent-ws-42-sl`                      | 2.42.5.1 / Tomcat 10            | SL v42                     | Tested; deleted                                                                                                                                |
+| `agent-ws-42-lao`                     | 2.42.5.1 / Tomcat 10            | Laos v41 (Flyway-migrated) | Tested; deleted                                                                                                                                |
+| `agent-ws-43-sl`                      | 2.43.0.1 / Tomcat 10            | SL v43                     | Tested; deleted                                                                                                                                |
+| `agent-ws-43-lao`                     | 2.43.0.1 / Tomcat 10            | Laos v41 (Flyway-migrated) | Tested; deleted                                                                                                                                |
+| `agent-ws-41-sl` (re-validation)      | 2.41.9 / Tomcat 9               | SL v41                     | Re-tested follow-up fixes (21/21); deleted                                                                                                     |
+| `agent-ws-43-sl` (manual testing)     | 2.43.0.1 / Tomcat 10            | SL v43                     | Manual testing via dev server (CORS whitelist extended with http://localhost:49210, not reverted - instance deleted); deleted at end of review |
+| `agent-ws-41-manual` (manual testing) | 2.41.9 / Tomcat 9               | SL v41                     | Manual testing with installed app zip; deleted at end of review                                                                                |
 
 **Pre-existing instances deleted**: the broker's 5-instance cap was fully
 occupied by stopped instances left by earlier agent sessions. To make room I

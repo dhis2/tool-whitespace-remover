@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.0]
 
 ### Changed
+
 - Migrated to the DHIS2 App Platform: React + TypeScript, `@dhis2/app-runtime`
   data engine, `@dhis2/ui` components. The custom fetch wrapper, jQuery,
   Materialize CSS and the legacy header-bar loader have been removed - the
@@ -16,9 +17,11 @@ All notable changes to this project will be documented in this file.
   properties the tool cannot clean.
 
 ## [0.2.0]
+
 - Added support for global app shell header barn in 42 and above
 
 ## [0.1.0]
 
 ### Added
+
 - Initial release.

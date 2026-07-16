@@ -74,8 +74,7 @@ export const MetadataTable = ({
 
     const selectedItems = items.filter((item) => selected.has(item.id))
     const allPageSelected =
-        pageItems.length > 0 &&
-        pageItems.every((item) => selected.has(item.id))
+        pageItems.length > 0 && pageItems.every((item) => selected.has(item.id))
     const somePageSelected = pageItems.some((item) => selected.has(item.id))
     const canFixSelected =
         selectedItems.length > 0 &&

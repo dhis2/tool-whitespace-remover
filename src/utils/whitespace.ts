@@ -6,8 +6,7 @@ import {
 
 /** True when the string has leading/trailing whitespace or repeated whitespace */
 export const needsCleaning = (value: unknown): value is string =>
-    typeof value === 'string' &&
-    (/\s\s+/.test(value) || value.trim() !== value)
+    typeof value === 'string' && (/\s\s+/.test(value) || value.trim() !== value)
 
 /** Collapse repeated whitespace to a single space and trim the ends */
 export const cleanString = (value: string): string =>

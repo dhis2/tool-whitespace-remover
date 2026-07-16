@@ -16,3 +16,4 @@ d2auth.json
 .vscode
 bin
 .DS_Store
+__pycache__/

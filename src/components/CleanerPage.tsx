@@ -43,13 +43,14 @@ export const CleanerPage = () => {
     const [busy, setBusy] = useState(false)
     const [conflictModal, setConflictModal] =
         useState<ConflictModalState | null>(null)
-    const [resultsModal, setResultsModal] =
-        useState<ResultsModalState | null>(null)
-
-    const { show: showSuccess } = useAlert(
-        ({ message }) => String(message),
-        { success: true, duration: 3000 }
+    const [resultsModal, setResultsModal] = useState<ResultsModalState | null>(
+        null
     )
+
+    const { show: showSuccess } = useAlert(({ message }) => String(message), {
+        success: true,
+        duration: 3000,
+    })
     const { show: showError } = useAlert(({ message }) => String(message), {
         critical: true,
     })
@@ -256,8 +257,7 @@ export const CleanerPage = () => {
             return
         }
         const toFix = activeItems.filter(
-            (item) =>
-                selected.has(item.id) && statuses[item.id] === 'ready'
+            (item) => selected.has(item.id) && statuses[item.id] === 'ready'
         )
         applyFix(activeType, toFix)
     }
@@ -284,10 +284,7 @@ export const CleanerPage = () => {
     if (types.length === 0) {
         return (
             <div className={styles.page}>
-                <NoticeBox
-                    valid
-                    title={i18n.t('No whitespace issues found')}
-                >
+                <NoticeBox valid title={i18n.t('No whitespace issues found')}>
                     {i18n.t(
                         'No metadata with leading, trailing or double whitespace in names, codes or descriptions was found.'
                     )}

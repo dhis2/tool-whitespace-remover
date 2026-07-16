@@ -27,10 +27,13 @@ export const FixResultsModal = ({ fixedCount, errors, onClose }: Props) => (
         <ModalTitle>{i18n.t('Fix results')}</ModalTitle>
         <ModalContent>
             <p>
-                {i18n.t('{{fixed}} object(s) fixed, {{failed}} object(s) failed.', {
-                    fixed: fixedCount,
-                    failed: errors.length,
-                })}
+                {i18n.t(
+                    '{{fixed}} object(s) fixed, {{failed}} object(s) failed.',
+                    {
+                        fixed: fixedCount,
+                        failed: errors.length,
+                    }
+                )}
             </p>
             {errors.length > 0 && (
                 <DataTable>

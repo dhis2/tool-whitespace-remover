@@ -15,12 +15,12 @@ Add these bullets:
   create API accepts `"tomcat": "9"|"10"` — set it explicitly for
   41-and-below. Symptom of a mismatch: the create job succeeds and Tomcat
   answers, but every path (including `/api/*`) is 404 indefinitely.
-  *(Encountered: first two 2.41 instances were created with the broker's
-  default Tomcat 10 and never came up.)*
+  _(Encountered: first two 2.41 instances were created with the broker's
+  default Tomcat 10 and never came up.)_
 - **Boot one instance at a time** on resource-constrained hosts. Two DHIS2
-  instances *booting* concurrently can starve each other (20+ minutes with
+  instances _booting_ concurrently can starve each other (20+ minutes with
   no webapp); create the next only after the previous answers on
-  `/api/system/info`. Two already-*running* instances is usually fine.
+  `/api/system/info`. Two already-_running_ instances is usually fine.
 - The instance cap counts **stopped** instances too, including stale
   `agent-*` leftovers from earlier sessions — the cap error names deletion
   candidates. Delete only agent-managed instances and record it in
@@ -29,7 +29,7 @@ Add these bullets:
   with `admin` disabled or a non-default password (e.g. the Laos HMIS demo
   seed → 401 "Account disabled"). Fix via direct DB update
   (`UPDATE userinfo SET disabled=false, password='<bcrypt of district>'
-  WHERE username='admin'`; DB at `dhis2-<name>-db:5432`, user/pass/db
+WHERE username='admin'`; DB at `dhis2-<name>-db:5432`, user/pass/db
   `dhis`/`dhis`/`dhis2`) — and do it **before the first login attempt**:
   DHIS2 caches user details, so after a failed login only a full instance
   restart clears it.
@@ -55,9 +55,9 @@ boundary:
   global-shell iframe, while 2.41 serves the same
   `/api/apps/<key>/index.html` URL directly. Write suites frame-aware from
   the start (scan `page.frames` for a known app selector) so one suite
-  covers all versions. *(Encountered: a suite that passed on 2.41 timed out
+  covers all versions. _(Encountered: a suite that passed on 2.41 timed out
   on 2.42 even though the app rendered perfectly — selectors ran against
-  the top document.)*
+  the top document.)_
 
 ## 3. `references/playwright-patterns.md` — new section
 
@@ -80,8 +80,8 @@ Common root cause in DHIS2 apps: an auto-layout `<table>` with an
 initially-empty column (e.g. a Status column that later receives a Tag) —
 the browser rebalances all column widths when content appears. Fix: give
 the column a fixed `width` on its header. Verify the fix with the same
-measurement (expect all-zero shifts). *(Encountered: 9px column shift on
-check in this app; fixed with `width="110px"`.)*
+measurement (expect all-zero shifts). _(Encountered: 9px column shift on
+check in this app; fixed with `width="110px"`.)_
 
 ## 4. `references/version-testing.md` — one addition
 
@@ -91,7 +91,7 @@ check in this app; fixed with `width="110px"`.)*
 
 ## 5. Possibly out of scope for the skill (sandbox/broker docs instead)
 
-- Only one host-visible port per sandbox: when the user wants *manual*
+- Only one host-visible port per sandbox: when the user wants _manual_
   testing of a second instance/version simultaneously, install the built
   zip into DHIS2 (test at the instance's own host port) rather than trying
   to run a second dev server.

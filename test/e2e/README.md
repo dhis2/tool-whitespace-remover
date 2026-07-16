@@ -44,5 +44,5 @@ Notes:
   the suite locates the app frame automatically and works on 2.41's
   direct-serve mode too.
 - The Laos demo seed (`lao_hmis_demo_v41`) ships with the `admin` account
-  disabled — enable it directly in the instance database *before* the first
+  disabled — enable it directly in the instance database _before_ the first
   login attempt (DHIS2 caches user details; otherwise restart the instance).
