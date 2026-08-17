@@ -1,4 +1,4 @@
-# Whitespace Cleaner Tool
+# Whitespace Remover Tool
 
 Tool to remove trailing, leading and double white space in metadata (name, shortName, description, code properties).
 

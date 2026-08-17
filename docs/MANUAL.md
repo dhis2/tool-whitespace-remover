@@ -1,4 +1,4 @@
-# Whitespace Cleaner Tool User Manual
+# Whitespace Remover Tool User Manual
 
 ## Table of Contents
 
@@ -10,14 +10,14 @@
 
 ## Introduction
 
-The **Whitespace Cleaner Tool** is a web application designed to clean up whitespace issues in your DHIS2 metadata. It identifies and fixes leading, trailing, and double spaces in metadata properties like `name`, `code`, `description`, and `shortName`.
+The **Whitespace Remover Tool** is a web application designed to clean up whitespace issues in your DHIS2 metadata. It identifies and fixes leading, trailing, and double spaces in metadata properties like `name`, `code`, `description`, and `shortName`.
 
 ## Installation
 
-Follow these steps to install the Whitespace Cleaner in your DHIS2 instance:
+Follow these steps to install the Whitespace Remover in your DHIS2 instance:
 
 1. **Download the Zip File**:
-    - Ensure you have the build ZIP file of the Whitespace Cleaner application.
+    - Ensure you have the build ZIP file of the Whitespace Remover application.
 
 2. **Log In to DHIS2**:
     - Open your preferred web browser and log in to your DHIS2 instance with an account that has administrative privileges.
@@ -28,10 +28,10 @@ Follow these steps to install the Whitespace Cleaner in your DHIS2 instance:
 4. **Upload the App**:
     - In the App Management screen, click on the `Install app` button.
     - Choose the ZIP file you downloaded and click `Upload`.
-    - Once uploaded, the Whitespace Cleaner app will appear in your DHIS2 app list.
+    - Once uploaded, the Whitespace Remover app will appear in your DHIS2 app list.
 
 5. **Launch the App**:
-    - From the DHIS2 home screen, click on the Whitespace Cleaner icon to launch the app.
+    - From the DHIS2 home screen, click on the Whitespace Remover icon to launch the app.
 
 ## Navigating the UI
 

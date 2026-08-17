@@ -1,10 +1,10 @@
-"""Functional test suite for the Whitespace Cleaner app (installed in DHIS2).
+"""Functional test suite for the Whitespace Remover app (installed in DHIS2).
 
 Usage: python3 run_suite.py <base_url> <label>
 e.g.   python3 run_suite.py http://dhis2-agent-ws-41-sl:8080 41-sl
 
 Assumes seed_metadata.py has been run against the instance and the app
-zip has been installed (app key: whitespace-cleaner).
+zip has been installed (app key: tool-whitespace-remover).
 
 Writes results JSON to results/<label>.json and screenshots to
 results/<label>-*.png.
@@ -22,7 +22,7 @@ from d2 import get, login_cookie
 
 BASE = sys.argv[1]
 LABEL = sys.argv[2]
-APP_URL = f"{BASE}/api/apps/whitespace-cleaner/index.html"
+APP_URL = f"{BASE}/api/apps/tool-whitespace-remover/index.html"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 os.makedirs(OUT, exist_ok=True)
 

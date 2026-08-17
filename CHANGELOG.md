@@ -15,6 +15,10 @@ All notable changes to this project will be documented in this file.
   organisation units (previously only the bulk check did).
 - The scan now excludes objects whose whitespace issues are only in
   properties the tool cannot clean.
+- Renamed to align with the repository: the app is now titled
+  **Whitespace Remover Tool** with app key `tool-whitespace-remover`
+  (previously "Whitespace Cleaner Tool"). Installing 1.0.0 does not
+  replace an installed 0.x app — uninstall the old one manually.
 
 ## [0.2.0]
 

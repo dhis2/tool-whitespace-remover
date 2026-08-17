@@ -1,5 +1,5 @@
 {
-    "name": "tool-whitespace-cleaner",
+    "name": "tool-whitespace-remover",
     "version": "1.0.0",
     "description": "Tool for identifying and removing leading, trailing and double whitespace in metadata",
     "license": "BSD-3-Clause",

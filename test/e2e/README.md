@@ -1,6 +1,6 @@
 # End-to-end acceptance suite
 
-Playwright-based functional tests for the Whitespace Cleaner app, run against
+Playwright-based functional tests for the Whitespace Remover app, run against
 a live DHIS2 instance with the production zip installed. This is the suite
 used to verify the App Platform migration on DHIS2 2.41–2.43 with the Sierra
 Leone and Laos demo databases (see `docs/review-2026-07/UI-TEST-RESULTS.md`).
@@ -11,7 +11,7 @@ Leone and Laos demo databases (see `docs/review-2026-07/UI-TEST-RESULTS.md`).
   `playwright install chromium`)
 - A disposable DHIS2 instance with `admin`/`district` credentials
   (**never run against a real instance — the suite mutates metadata**)
-- The built app zip: `pnpm run build` → `build/bundle/whitespace-cleaner-<version>.zip`
+- The built app zip: `pnpm run build` → `build/bundle/tool-whitespace-remover-<version>.zip`
 
 ## Usage
 
@@ -21,10 +21,10 @@ Leone and Laos demo databases (see `docs/review-2026-07/UI-TEST-RESULTS.md`).
 python3 seed_metadata.py http://<instance>:8080
 
 # 2. Install the built zip (POST /api/apps)
-curl -u admin:district -F file=@../../build/bundle/whitespace-cleaner-1.0.0.zip \
+curl -u admin:district -F file=@../../build/bundle/tool-whitespace-remover-1.0.0.zip \
     "http://<instance>:8080/api/apps"
-# verify it landed (app key: whitespace-cleaner)
-curl -su admin:district "http://<instance>:8080/api/apps.json" | grep -o whitespace-cleaner | head -1
+# verify it landed (app key: tool-whitespace-remover)
+curl -su admin:district "http://<instance>:8080/api/apps.json" | grep -o tool-whitespace-remover | head -1
 
 # 3. Run the suite; results JSON + screenshots land in ./results/
 python3 run_suite.py http://<instance>:8080 <label>
