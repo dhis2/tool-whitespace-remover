@@ -26,6 +26,7 @@
         "react-router-dom": "^7.18.1"
     },
     "devDependencies": {
+        "@babel/plugin-transform-private-methods": "^7.27.1",
         "@dhis2/cli-app-scripts": "12.10.3",
         "@dhis2/config-eslint": "^0.2.2",
         "@dhis2/config-prettier": "^0.2.2",
