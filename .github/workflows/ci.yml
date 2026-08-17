@@ -1,0 +1,38 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    verify:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm run lint
+
+            - name: Typecheck
+              run: pnpm exec tsc --noEmit
+
+            - name: Build
+              run: pnpm run build
+
+            - name: Upload bundle
+              uses: actions/upload-artifact@v4
+              with:
+                  name: app-bundle
+                  path: build/bundle/*.zip
