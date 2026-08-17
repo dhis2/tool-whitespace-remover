@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('node:path')
 
 // The platform's default jest config isn't in the package's export map,
 // so resolve it relative to the package entry point.
